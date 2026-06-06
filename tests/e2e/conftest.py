@@ -64,9 +64,7 @@ def _configure_kodi_settings(http_url: str) -> bool:
             resp = requests.post(http_url, json=payload, timeout=10)
             data = resp.json()
             if data.get("result") is not True:
-                logger.error(
-                    "Failed to set %s=%s: %s", setting_id, value, data
-                )
+                logger.error("Failed to set %s=%s: %s", setting_id, value, data)
                 return False
             logger.info("Kodi setting %s = %s applied", setting_id, value)
         except Exception as exc:
@@ -294,16 +292,11 @@ def kodi_container(e2e_config: E2EConfig) -> Generator[str, None, None]:
     zip_filename = find_addon_zip(dist_dir)
 
     if zip_filename is None:
-        pytest.skip(
-            "Addon ZIP not found in dist/. "
-            "Build it first: python3 build_addon.py"
-        )
+        pytest.skip("Addon ZIP not found in dist/. Build it first: python3 build_addon.py")
 
     # Step 2: Start container
     if not _start_container(e2e_config):
-        pytest.skip(
-            "Failed to start Kodi container (version: %s)" % e2e_config.kodi_version
-        )
+        pytest.skip("Failed to start Kodi container (version: %s)" % e2e_config.kodi_version)
 
     container_name = _CONTAINER_NAME_TEMPLATE % e2e_config.kodi_version
     http_url = "http://%s:%d/jsonrpc" % (e2e_config.kodi_host, e2e_config.kodi_http_port)
@@ -312,8 +305,7 @@ def kodi_container(e2e_config: E2EConfig) -> Generator[str, None, None]:
     if not _wait_for_healthcheck(http_url, timeout=60.0, interval=2.0):
         _stop_container(e2e_config)
         pytest.skip(
-            "Kodi container not reachable within 60s (version: %s, url: %s)"
-            % (e2e_config.kodi_version, http_url)
+            "Kodi container not reachable within 60s (version: %s, url: %s)" % (e2e_config.kodi_version, http_url)
         )
 
     # Step 4: Provision settings.xml BEFORE enabling the addon
@@ -325,31 +317,24 @@ def kodi_container(e2e_config: E2EConfig) -> Generator[str, None, None]:
     }
     if not provision_settings(container_name, settings_dict):
         _stop_container(e2e_config)
-        pytest.skip(
-            "Failed to provision addon settings.xml in container %s" % container_name
-        )
+        pytest.skip("Failed to provision addon settings.xml in container %s" % container_name)
 
     # Step 5: Install addon from ZIP (unzip inside container)
     if not install_addon_from_zip(container_name, zip_filename):
         _stop_container(e2e_config)
-        pytest.skip(
-            "Failed to install addon from ZIP in container %s" % container_name
-        )
+        pytest.skip("Failed to install addon from ZIP in container %s" % container_name)
 
     # Step 6: Enable addon via Addons.SetAddonEnabled
     if not enable_addon(http_url, ADDON_ID):
         _stop_container(e2e_config)
-        pytest.skip(
-            "Failed to enable addon %s in container %s" % (ADDON_ID, container_name)
-        )
+        pytest.skip("Failed to enable addon %s in container %s" % (ADDON_ID, container_name))
 
     # Step 7: Verify addon appears in Addons.GetAddons within 15s
     if not verify_addon_enabled(http_url, ADDON_ID, timeout=15.0):
         log_tail = _get_kodi_log_tail(container_name, lines=200)
         _stop_container(e2e_config)
         pytest.skip(
-            "Addon %s not found in Addons.GetAddons within 15s.\n"
-            "Last 200 lines of kodi.log:\n%s" % (ADDON_ID, log_tail)
+            "Addon %s not found in Addons.GetAddons within 15s.\nLast 200 lines of kodi.log:\n%s" % (ADDON_ID, log_tail)
         )
 
     # Step 8: Configure Kodi locale (Russian) AFTER addon is installed
@@ -358,9 +343,7 @@ def kodi_container(e2e_config: E2EConfig) -> Generator[str, None, None]:
     # loaded without a full Kodi restart.
     if not _configure_kodi_settings(http_url):
         _stop_container(e2e_config)
-        pytest.skip(
-            "Failed to configure Kodi settings (locale) in %s" % container_name
-        )
+        pytest.skip("Failed to configure Kodi settings (locale) in %s" % container_name)
 
     yield container_name
 

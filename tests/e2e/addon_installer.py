@@ -73,10 +73,9 @@ def install_addon_from_zip(container_name: str, zip_filename: str) -> bool:
 
     # Unzip the addon into the addons directory using Python's zipfile module
     # (unzip binary may not be available in minimal container images)
-    python_script = (
-        "import zipfile; "
-        "zipfile.ZipFile('%s').extractall('%s')"
-        % (zip_path_in_container, ADDONS_INSTALL_PATH)
+    python_script = "import zipfile; zipfile.ZipFile('%s').extractall('%s')" % (
+        zip_path_in_container,
+        ADDONS_INSTALL_PATH,
     )
     cmd = [
         "docker",

@@ -1,0 +1,56 @@
+# Environment and credentials
+.env
+*.env.local
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Build artifacts
+dist/
+
+# Logs and temporary databases
+*.log
+kodi.log
+*.db
+
+# Test/coverage artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# API response dumps (may contain tokens)
+streams_response.json
+auth_info_response.json
+api_test_results.json
+api_exploration_results.json
+api_test_checklist.json
+streams_success.json
+api_key.txt
+
+# Swagger docs
+swagger-docs.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Kiro local settings and scripts (may contain tokens/paths)
+.kiro/settings/
+.kiro/scripts/
+.kiro/session_context.md
+.kiro/specs/
+
+# E2E test artifacts
+tests/e2e/artifacts/
+
+# Temporary files
+temp/
+.gitignore.proposed

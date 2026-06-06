@@ -125,7 +125,7 @@ class TestVODNavigation:
             # Some categories may have no genres and redirect directly
             pytest.skip("Category '%s' returned no items (may redirect)" % first_category_label)
 
-        # Navigate into the first genre (usually "All" / "Все") to get content
+        # Navigate into the first genre (usually "All" / "Vse") to get content
         first_genre_url = genre_items[0].get("file", "")
         assert first_genre_url, "First genre item in category '%s' has no file URL" % first_category_label
 
@@ -243,14 +243,13 @@ def _start_playback_via_http(kodi_client, play_url):
         kodi_client: Connected KodiClient instance.
         play_url: The plugin:// URL to play.
     """
-    try:
+    with suppress(Exception):
         kodi_client.send_request(
             "Player.Open",
             {"item": {"file": play_url}},
             timeout=5,
         )
-    except Exception:
-        pass  # Expected — connection drops during stream resolution
+    # Expected — connection drops during stream resolution
 
     time.sleep(5.0)
     _ensure_ws_connected(kodi_client)
@@ -413,9 +412,7 @@ class TestVODSearch:
                             if len(title) >= 4:
                                 search_term = title[:4]
 
-        search_url = (
-            _ADDON_URL + "?mode=vod_get_ordered_list&page_nr=1&sortby=name&vod_search=" + quote(search_term)
-        )
+        search_url = _ADDON_URL + "?mode=vod_get_ordered_list&page_nr=1&sortby=name&vod_search=" + quote(search_term)
         # Search with preloading can take longer — use extended timeout
         result = kodi_client.send_request(
             "Files.GetDirectory",

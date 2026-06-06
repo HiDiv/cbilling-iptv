@@ -11,17 +11,12 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 
-import pytest
-
 # Ensure tests/e2e modules are importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
 
 from tests.e2e.addon_installer import (
-    ADDON_ID,
     find_addon_zip,
-    provision_settings,
 )
-
 
 # ===========================================================================
 # find_addon_zip() Tests
@@ -224,9 +219,7 @@ class TestSettingsXmlGeneration:
         # New format: <setting id="x">y</setting>
         root = ET.fromstring(xml_str)
         for elem in root.findall("setting"):
-            assert "value" not in elem.attrib, (
-                "Should not use old Kodi 18 'value' attribute format"
-            )
+            assert "value" not in elem.attrib, "Should not use old Kodi 18 'value' attribute format"
 
     def test_positive_xml_is_well_formed(self):
         """Generated XML is well-formed and parseable."""

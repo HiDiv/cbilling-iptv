@@ -1,0 +1,146 @@
+# pyproject.toml — Tool configuration for plugin.video.cbilling.iptv
+# No [build-system] or [project] section: this is a Kodi addon, not a pip package.
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+extend-exclude = [
+    "resources/lib/vendor",
+    "resources/lib/croniter.py",
+    "ordereddict.py",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific rules
+]
+# --- Permanent ignores (Kodi addon specifics, kept intentionally) ---
+ignore = [
+    "E501",   # line too long — handled by ruff formatter
+    "F403",   # star imports — Kodi addons use `from xbmc import *`
+    "F405",   # may be undefined from star import — consequence of F403
+    "UP031",  # printf-style formatting — codebase uses %, migration to f-strings is separate effort
+]
+
+# --- Legacy per-file ignores (technical debt — see docs/technical-debt.md) ---
+# These rules are disabled ONLY for existing files that predate the strict lint policy.
+# New files MUST comply with all rules. Remove ignores as files are refactored.
+[tool.ruff.lint.per-file-ignores]
+"resources/lib/vendor/*" = ["ALL"]  # Third-party vendored libraries — never modified
+"resources/lib/croniter.py" = ["ALL"]  # Third-party vendored code
+"ordereddict.py" = ["ALL"]  # Legacy Python 2/3 compatibility module
+"default.py" = [
+    "E711",   # comparison to None with == instead of `is`
+    "E722",   # bare except (pervasive Kodi error handling pattern)
+    "F821",   # undefined name `local_b64decode` (cross-module reference via star import)
+    "N812",   # lowercase `body` imported as non-lowercase `cbBody`
+    "SIM105", # try/except/pass instead of contextlib.suppress
+]
+"resources/lib/body.py" = [
+    "B007",   # unused loop control variable
+    "E402",   # module-level import not at top (sys.path setup before imports)
+    "E711",   # comparison to None with == instead of `is`
+    "E722",   # bare except (pervasive Kodi error handling pattern)
+    "F841",   # local variable assigned but never used
+    "N802",   # function name should be lowercase (CBILLING_init, CBILLING_start, etc.)
+    "N806",   # variable in function should be lowercase (dbConn, dbCursor, etc.)
+    "N812",   # lowercase imported as non-lowercase (urlQuote, urlUnquote)
+    "N816",   # mixed case variable in global scope (epgFile, cbAPI, etc.)
+    "RUF001", # ambiguous unicode — intentional Cyrillic strings in IPTV addon
+    "RUF046", # unnecessary cast to int/float — explicit conversions for clarity
+    "SIM102", # nested if statements
+    "SIM105", # try/except/pass instead of contextlib.suppress
+    "SIM108", # if/else instead of ternary operator
+    "SIM115", # file open without context manager
+    "SIM201", # `not ==` instead of `!=`
+    "UP036",  # outdated Python 2/3 version block
+]
+"resources/lib/api_client.py" = [
+    "B904",   # raise without `from` in except clause
+    "E402",   # module-level import not at top (conditional imports)
+    "F401",   # conditional simplejson/OrderedDict imports
+    "SIM105", # try/except/pass instead of contextlib.suppress
+    "UP036",  # outdated Python 2/3 version block
+]
+"resources/lib/api_adapter.py" = [
+    "F401",   # conditional simplejson import
+    "SIM105", # try/except/pass instead of contextlib.suppress
+]
+"resources/lib/utils.py" = [
+    "B006",   # mutable default argument (getRegionalTimestamp)
+    "F821",   # undefined name `encode` (cross-module reference via star import)
+    "N802",   # function name should be lowercase (getSetting, getString, etc.)
+    "N806",   # variable in function should be lowercase (aFormat)
+]
+"resources/lib/vod_cache.py" = [
+    "E722",   # bare except (SQLite error handling)
+    "N806",   # variable in function should be lowercase (dbConn, dbCursor, etc.)
+    "N816",   # mixed case variable in global scope (vodCacheFile)
+    "SIM102", # nested if statements
+]
+"resources/lib/cron.py" = [
+    "E722",   # bare except
+    "N802",   # function name should be lowercase (deleteJob, getJobs, etc.)
+    "N803",   # argument name should be lowercase (jId, cronJob)
+    "N806",   # variable in function should be lowercase (nextRun, cronDiff, etc.)
+    "RUF012", # mutable class attribute default
+    "SIM118", # key in dict.keys() instead of key in dict
+]
+# Test files — Kodi API mocks must match camelCase naming of real Kodi API
+"tests/conftest.py" = [
+    "N802",   # Kodi API mock methods: getSetting, setArt, addDirectoryItem, etc.
+    "N803",   # Kodi API mock arguments: isFolder, totalItems, etc.
+    "SIM115", # mock File class uses open() without context manager
+]
+"tests/unit/test_vod_cache.py" = [
+    "N802",   # Kodi API mock methods in local fixtures
+]
+"tests/unit/test_vod_preload.py" = [
+    "N802",   # Kodi API mock methods in local fixtures
+]
+"tests/unit/test_watch_history.py" = [
+    "N802",   # Kodi API mock methods in local fixtures
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "api: tests that call the live Cbilling API (require .env credentials, deselected by default)",
+    "e2e: end-to-end tests requiring Docker and running Kodi container",
+]
+addopts = "-m 'not api and not e2e'"
+timeout = 120
+
+[tool.coverage.run]
+source = ["resources/lib"]
+omit = [
+    "resources/lib/vendor/*",
+    "resources/lib/croniter.py",
+    "tests/*",
+]
+
+[tool.coverage.report]
+# Target: 70% for testable modules. Not enforced as fail_under because body.py
+# (2300+ lines, Kodi UI) dominates total and is untestable outside Kodi runtime.
+# fail_under = 70
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.",
+    "pass",
+]

@@ -16,8 +16,8 @@ from urllib.parse import parse_qs, unquote, urlparse
 import pytest
 import requests
 
-from tests.e2e.kodi_client import KodiClient
 from tests.e2e.exceptions import KodiConnectionError
+from tests.e2e.kodi_client import KodiClient
 from tests.e2e.utils import strip_kodi_tags
 
 # ---------------------------------------------------------------------------
