@@ -1,0 +1,15 @@
+<settings version="2">
+    <!-- Russian language for target audience -->
+    <setting id="locale.language">resource.language.ru_ru</setting>
+    <!-- Allow addon installation from unknown sources -->
+    <setting id="addons.unknownsources">true</setting>
+    <!-- Timezone configuration -->
+    <setting id="locale.timezone">Europe/Moscow</setting>
+    <setting id="locale.timezonecountry">Russia</setting>
+    <!-- Enable JSON-RPC HTTP server on all interfaces -->
+    <setting id="services.webserver">true</setting>
+    <setting id="services.webserverport">8080</setting>
+    <setting id="services.esallinterfaces">true</setting>
+    <!-- Enable JSON-RPC WebSocket (EventServer) -->
+    <setting id="services.esenabled">true</setting>
+</settings>

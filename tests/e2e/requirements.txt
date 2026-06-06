@@ -1,0 +1,4 @@
+websockets>=10.0,<13.0
+requests>=2.25.0,<3.0
+docker>=6.0,<8.0
+pytest-timeout>=2.2.0

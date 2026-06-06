@@ -1,0 +1,47 @@
+# Docker Compose for E2E testing with Kodi containers
+# Usage: docker compose --profile kodi20 up -d
+
+x-kodi-common: &kodi-common
+  ports:
+    - "8080:8080"
+    - "9090:9090"
+    - "5900:5900"
+    - "8000:8000"
+  volumes:
+    - ../../dist/:/addons_zip/:ro
+  env_file:
+    - ../../.env
+  environment:
+    - KODI_LOG_LEVEL=0
+    - TZ=Europe/Moscow
+  healthcheck:
+    test: >-
+      curl -sf -X POST -H "Content-Type: application/json"
+      -d '{"jsonrpc":"2.0","method":"JSONRPC.Ping","id":1}'
+      http://localhost:8080/jsonrpc || exit 1
+    interval: 10s
+    timeout: 5s
+    retries: 5
+    start_period: 30s
+
+services:
+  kodi19:
+    <<: *kodi-common
+    image: kodi-test:19
+    profiles:
+      - kodi19
+    container_name: kodi-e2e-kodi19
+
+  kodi20:
+    <<: *kodi-common
+    image: kodi-test:20
+    profiles:
+      - kodi20
+    container_name: kodi-e2e-kodi20
+
+  kodi21:
+    <<: *kodi-common
+    image: kodi-test:21
+    profiles:
+      - kodi21
+    container_name: kodi-e2e-kodi21
