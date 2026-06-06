@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.cbilling.iptv" name="Cbilling.TV IPTV" version="2.1.0" provider-name="HiDiv">
+   <requires>
+      <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource"  provides="video" library="default.py"><provides>video</provides></extension>
+  <extension point="xbmc.service" library="service.py" start="login" />
+  <extension point="xbmc.python.module" library="resources/lib" />
+  <extension point="xbmc.addon.metadata">
+      <summary>Cbilling.tv IPTV player</summary>
+      <description>Providing access to Cbilling.TV IPTV channels and VoD. Compatible with Kodi 19+ (Matrix and later)</description>
+      <disclaimer lang="en">This addon is provided "as is" without any warranty. The authors are not liable for any data loss, corruption, or damages. This addon does not host any media content; users are responsible for legal compliance in their jurisdiction.</disclaimer>
+      <disclaimer lang="ru">Аддон предоставляется «как есть» без каких-либо гарантий. Авторы не несут ответственности за потерю данных, их повреждение или любой ущерб. Аддон не размещает медиаконтент; пользователи несут ответственность за соблюдение законодательства в своей юрисдикции.</disclaimer>
+      <platform>all</platform>
+      <license>AGPL-3.0-only</license>
+      <news>
+
+2.1.0
+[fix] EPG timezone: time now displays in user's configured timezone (stb_timezone setting)
+[fix] EPG time from API 'date' field (server timezone) is now ignored, Unix timestamps used instead
+[fix] EPG cache: t_time/t_time_to recalculated from timestamps on read (timezone change works instantly)
+[fix] SQLite: "no such table: config" crash when config table lost from existing EPG database
+[fix] SQLite: "NoneType is not callable" race condition between cron and UI threads
+[fix] SQLite: all connections use timeout=10 and WAL mode for concurrent access
+[info] Uses dateutil.tz from vendor for timezone conversion (no new dependencies)
+[info] Warning logged once if timezone setting is empty or invalid (fallback to system time)
+[new] Watch history: episodes navigate to episode list instead of direct playback
+[new] Episode list auto-positions cursor on the watched episode
+
+2.0.4-dev
+[new] Watch History feature for VOD (configurable size, default 5 items)
+[new] Context menu for history items (remove, clear all)
+[new] Settings for history management
+[fix] IPTV channel sorting now respects server order
+[fix] VOD pagination - now showing all items with "Next page" button
+[fix] "All genres" folder now displays content correctly
+[fix] urllib3 compatibility with Python 3.8 (Kodi 19.4)
+[info] Added client-side pagination (20 items per page)
+[info] Auto-generate episode/season names when missing
+
+2.0.3-dev
+[fix] EPG cache performance optimization
+[fix] Removed blocking EPG reload on channel list open
+[info] EPG now loads instantly, cache updates in background
+
+2.0.2-dev
+[fix] Python 3.8 compatibility (Kodi 19/20)
+[fix] Fixed urllib3 type hints for older Python versions
+[info] Tested with Kodi 19.4 (Matrix) and Kodi 20 (Nexus)
+
+2.0.1-dev
+[dev] Development version - API migration testing
+[info] This is a pre-release version for testing purposes
+
+2.0.0
+[new] Migrated from Stalker Portal to new REST API
+[new] Direct stream URLs (no more create_link calls)
+[new] Local favorites storage (no server dependency)
+[new] Simplified auth with public key
+[fix] Removed dependency on mag-aura.com Stalker Portal
+
+XX.3.0
+[fix] Speed optimization
+[fix] VOD opening (added to the favorites) after token expiration
+
+XX.2.7
+[fix] Improve auth error messaging
+
+1X.2.6
+[fix] Fix API server URL
+
+1X.2.5
+[fix] EPG timeout issue
+[new] Add response timeout selection to the config
+[new] Add stream server selection to the context menu
+
+      </news>
+      <forum>https://clck.ru/KcXML</forum>
+      <assets>
+         <icon>icon.png</icon>
+         <fanart>fanart/archive_01.jpg</fanart>
+      </assets>
+   </extension>
+</addon>

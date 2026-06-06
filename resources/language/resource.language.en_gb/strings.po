@@ -1,0 +1,630 @@
+# Kodi Media Center language file
+# Addon Name: Cbilling.TV IPTV
+# Addon id: plugin.video.cbilling.iptv
+# Addon Provider: HiDiv
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Cbilling.TV Cron"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Loading channels"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Server connection error"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Authentication problem"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Server response"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Server Error"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Check your account settings"
+msgstr ""
+
+msgctxt "#30007"
+msgid "No response from the server"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Something goes wrong. Please restart an addon"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Failed to create local cache file"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Failed to clean local cache file"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Starting local EPG update"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Updating local EPG"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Received EPG has no data"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Failed to save EPG data to the local cache"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Local EPG update completed"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Failed to check EPG local cache validity"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Missed account data. Check addon settings"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Authentication error"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Error"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Login successfully"
+msgstr ""
+
+msgctxt "#30021"
+msgid "EPG scheduler settings error"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Failed to load addon's scheduler service"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Failed to delete scheduler job"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Failed to update scheduler job"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Failed to register new scheduler job"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Live"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Archive"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Beloved channels"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Media library"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Failed to validate Category local cache"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Failed to load TV channel categories"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Got an error from server"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Something goes wrong"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Beloved channels list is empty"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Channel is not in the beloved list"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Channel is already in the list"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Failed to save beloved channels list"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Channel added"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Channel removed"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Failed to retrieve channels list"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Preparing EPG and channels list"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Live now"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Archive - Week"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Choose any time"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Details"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Remove from beloved"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Add to beloved"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Next"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Failed to get channel stream URL"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Programme"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Specify date [DD/MM/YYYY]"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Specify time [ЧЧ:ММ]"
+msgstr ""
+
+msgctxt "#30053"
+msgid "This is the future!"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Monday"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Tuesday"
+msgstr ""
+
+msgctxt "#30056"
+msgid "Wednesday"
+msgstr ""
+
+msgctxt "#30057"
+msgid "Thursday"
+msgstr ""
+
+msgctxt "#30058"
+msgid "Friday"
+msgstr ""
+
+msgctxt "#30059"
+msgid "Saturday"
+msgstr ""
+
+msgctxt "#30060"
+msgid "Sunday"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Unknown error"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Try later"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Downloading selected day's EPG"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Failed to get EPG for the selected day"
+msgstr ""
+
+msgctxt "#30065"
+msgid "EPG not found"
+msgstr ""
+
+msgctxt "#30066"
+msgid "Later today"
+msgstr ""
+
+msgctxt "#30067"
+msgid "Media Category"
+msgstr ""
+
+msgctxt "#30068"
+msgid "Loading media list"
+msgstr ""
+
+msgctxt "#30069"
+msgid "Previous page"
+msgstr ""
+
+msgctxt "#30070"
+msgid "Sort By"
+msgstr ""
+
+msgctxt "#30071"
+msgid "Name"
+msgstr ""
+
+msgctxt "#30072"
+msgid "Date added"
+msgstr ""
+
+msgctxt "#30073"
+msgid "Rating"
+msgstr ""
+
+msgctxt "#30074"
+msgid "Last viewed"
+msgstr ""
+
+msgctxt "#30075"
+msgid "Top"
+msgstr ""
+
+msgctxt "#30076"
+msgid "Next page"
+msgstr ""
+
+msgctxt "#30077"
+msgid "Episodes"
+msgstr ""
+
+msgctxt "#30078"
+msgid "Token error"
+msgstr ""
+
+msgctxt "#30079"
+msgid "Failed to get media file URL"
+msgstr ""
+
+msgctxt "#30080"
+msgid "Password to enable XXX channels"
+msgstr ""
+
+msgctxt "#30081"
+msgid "Week day"
+msgstr ""
+
+msgctxt "#30082"
+msgid "Minutes"
+msgstr ""
+
+msgctxt "#30083"
+msgid "Hours"
+msgstr ""
+
+msgctxt "#30084"
+msgid "Execute"
+msgstr ""
+
+msgctxt "#30085"
+msgid "Daily"
+msgstr ""
+
+msgctxt "#30086"
+msgid "Weekly"
+msgstr ""
+
+msgctxt "#30087"
+msgid "Su"
+msgstr ""
+
+msgctxt "#30088"
+msgid "Mo"
+msgstr ""
+
+msgctxt "#30089"
+msgid "Tu"
+msgstr ""
+
+msgctxt "#30090"
+msgid "We"
+msgstr ""
+
+msgctxt "#30091"
+msgid "Th"
+msgstr ""
+
+msgctxt "#30092"
+msgid "Fr"
+msgstr ""
+
+msgctxt "#30093"
+msgid "Sa"
+msgstr ""
+
+msgctxt "#30094"
+msgid "Enable EPG update scheduler"
+msgstr ""
+
+msgctxt "#30095"
+msgid "EPG auto-update"
+msgstr ""
+
+msgctxt "#30096"
+msgid "Hours to keep EPG"
+msgstr ""
+
+msgctxt "#30097"
+msgid "Keep local EPG"
+msgstr ""
+
+msgctxt "#30098"
+msgid "Programmes in short EPG"
+msgstr ""
+
+msgctxt "#30099"
+msgid "Show EPG?"
+msgstr ""
+
+msgctxt "#30100"
+msgid "Show Media Library"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Stream server"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Timezone"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Public Key (access code)"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Password"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Multiroom device number"
+msgstr ""
+
+msgctxt "#30106"
+msgid "EPG last update time"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30108"
+msgid "All genres"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Name/Actor/Director/Year"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Year"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Search in"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Enter year"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Search string (min. 3 symbols)"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Wrong year"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Too short search string"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Input error"
+msgstr ""
+
+msgctxt "#30117"
+msgid "Use aggressive EPG load"
+msgstr ""
+
+msgctxt "#30118"
+msgid "Remove local EPG cache"
+msgstr ""
+
+msgctxt "#30119"
+msgid "Show EPG"
+msgstr ""
+
+msgctxt "#30120"
+msgid "Today"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Tomorrow"
+msgstr ""
+
+msgctxt "#30122"
+msgid "After tomorrow"
+msgstr ""
+
+msgctxt "#30123"
+msgid "Play from start"
+msgstr ""
+
+msgctxt "#30124"
+msgid "Refresh"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Archive - Today"
+msgstr ""
+
+msgctxt "#30126"
+msgid "Stalker URL"
+msgstr ""
+
+msgctxt "#30127"
+msgid "New stream server is"
+msgstr ""
+
+msgctxt "#30128"
+msgid "Stream server"
+msgstr ""
+
+msgctxt "#30129"
+msgid "Server response timeout (sec)"
+msgstr ""
+
+msgctxt "#30130"
+msgid "API Server"
+msgstr ""
+
+msgctxt "#30131"
+msgid "Season"
+msgstr ""
+
+msgctxt "#30132"
+msgid "Episode"
+msgstr ""
+
+msgctxt "#30133"
+msgid "Movie Information"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Description"
+msgstr ""
+
+msgctxt "#30135"
+msgid "Year"
+msgstr ""
+
+msgctxt "#30136"
+msgid "Rating"
+msgstr ""
+
+msgctxt "#30137"
+msgid "Duration"
+msgstr ""
+
+msgctxt "#30138"
+msgid "min"
+msgstr ""
+
+msgctxt "#30139"
+msgid "Country"
+msgstr ""
+
+msgctxt "#30140"
+msgid "Genre"
+msgstr ""
+
+msgctxt "#30141"
+msgid "Director"
+msgstr ""
+
+msgctxt "#30142"
+msgid "Cast"
+msgstr ""
+
+msgctxt "#30143"
+msgid "Watch History"
+msgstr ""
+
+msgctxt "#30144"
+msgid "Remove from history"
+msgstr ""
+
+msgctxt "#30145"
+msgid "Clear all history"
+msgstr ""
+
+msgctxt "#30146"
+msgid "History is empty"
+msgstr ""
+
+msgctxt "#30147"
+msgid "History cleared"
+msgstr ""
+
+msgctxt "#30148"
+msgid "Season"
+msgstr ""
+
+msgctxt "#30149"
+msgid "Episode"
+msgstr ""
+
+msgctxt "#30150"
+msgid "Removed from history"
+msgstr ""
+
+msgctxt "#30151"
+msgid "Are you sure?"
+msgstr ""
+
+msgctxt "#30152"
+msgid "Watch History"
+msgstr ""
+
+msgctxt "#30153"
+msgid "History size"
+msgstr ""
+
+msgctxt "#30154"
+msgid "Clear watch history"
+msgstr ""

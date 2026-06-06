@@ -1,0 +1,630 @@
+# Kodi Media Center language file
+# Addon Name: Cbilling.TV IPTV
+# Addon id: plugin.video.cbilling.iptv
+# Addon Provider: HiDiv
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgctxt "#30000"
+msgid "Cbilling.TV Cron"
+msgstr "Cbilling.TV Cron"
+
+msgctxt "#30001"
+msgid "Loading channels"
+msgstr "Загружаю каналы"
+
+msgctxt "#30002"
+msgid "Server connection error"
+msgstr "Ошибка соединения с сервером"
+
+msgctxt "#30003"
+msgid "Authentication problem"
+msgstr "Аутентификация не прошла"
+
+msgctxt "#30004"
+msgid "Server response"
+msgstr "Ответ c сервера"
+
+msgctxt "#30005"
+msgid "Server Error"
+msgstr "Ошибка сервера"
+
+msgctxt "#30006"
+msgid "Check your account settings"
+msgstr "Проверьте свои данные"
+
+msgctxt "#30007"
+msgid "No response from the server"
+msgstr "Нет ответа от сервера"
+
+msgctxt "#30008"
+msgid "Something goes wrong. Please restart an addon"
+msgstr "Что-то пошло не так. Пожалуйста перезапустите аддон"
+
+msgctxt "#30009"
+msgid "Failed to create local cache file"
+msgstr "Не удалось создать локальный кеш файл"
+
+msgctxt "#30010"
+msgid "Failed to clean local cache file"
+msgstr "Не удалось очистить локальный кеш файл"
+
+msgctxt "#30011"
+msgid "Starting local EPG update"
+msgstr "Начинаю обновление локального EPG"
+
+msgctxt "#30012"
+msgid "Updating local EPG"
+msgstr "Обновляю локальный EPG"
+
+msgctxt "#30013"
+msgid "Received EPG has no data"
+msgstr "Нет данных в полученном EPG"
+
+msgctxt "#30014"
+msgid "Failed to save EPG data to the local cache"
+msgstr "Не получилось сохранить данные EPG в локальный кеш"
+
+msgctxt "#30015"
+msgid "Local EPG update completed"
+msgstr "Обновление локального EPG завершено"
+
+msgctxt "#30016"
+msgid "Failed to check EPG local cache validity"
+msgstr "Не удалось провалидировать локальный кеш файл EPG"
+
+msgctxt "#30017"
+msgid "Missed account data. Check addon settings"
+msgstr "Учетные данные не указаны. Введите их в настройках аддона!"
+
+msgctxt "#30018"
+msgid "Authentication error"
+msgstr "Ошибка аутентификации"
+
+msgctxt "#30019"
+msgid "Error"
+msgstr "Ошибка"
+
+msgctxt "#30020"
+msgid "Login successfully"
+msgstr "Успешный вход в систему"
+
+msgctxt "#30021"
+msgid "EPG scheduler settings error"
+msgstr "Ошибка в настройках планировщика EPG"
+
+msgctxt "#30022"
+msgid "Failed to load addon's scheduler service"
+msgstr "Не получилось загрузить сервис планировщика"
+
+msgctxt "#30023"
+msgid "Failed to delete scheduler job"
+msgstr "Не получилось удалить задачу из планировщика"
+
+msgctxt "#30024"
+msgid "Failed to update scheduler job"
+msgstr "Не получилось обновить задачу в планировщике"
+
+msgctxt "#30025"
+msgid "Failed to register new scheduler job"
+msgstr "Не получилось добавить задачу в планировщик"
+
+msgctxt "#30026"
+msgid "Live"
+msgstr "Прямой эфир"
+
+msgctxt "#30027"
+msgid "Archive"
+msgstr "Архив"
+
+msgctxt "#30028"
+msgid "Beloved channels"
+msgstr "Любимые каналы"
+
+msgctxt "#30029"
+msgid "Media library"
+msgstr "Медиатека"
+
+msgctxt "#30030"
+msgid "Failed to validate Category local cache"
+msgstr "Не удалось валидировать локальный кеш категорий"
+
+msgctxt "#30031"
+msgid "Failed to load TV channel categories"
+msgstr "Не удалось получить категории ТВ каналов"
+
+msgctxt "#30032"
+msgid "Got an error from server"
+msgstr "Уппс. Сервер вернул ошибку"
+
+msgctxt "#30033"
+msgid "Something goes wrong"
+msgstr "Что-то пошло не так"
+
+msgctxt "#30034"
+msgid "Beloved channels list is empty"
+msgstr "Список любимых каналов пуст"
+
+msgctxt "#30035"
+msgid "Channel is not in the beloved list"
+msgstr "Канал отсутствует в списке любимых"
+
+msgctxt "#30036"
+msgid "Channel is already in the list"
+msgstr "Канал уже добавлен"
+
+msgctxt "#30037"
+msgid "Failed to save beloved channels list"
+msgstr "Не получилось сохранить список любимых каналов"
+
+msgctxt "#30038"
+msgid "Channel added"
+msgstr "Канал добавлен"
+
+msgctxt "#30039"
+msgid "Channel removed"
+msgstr "Канал удалён"
+
+msgctxt "#30040"
+msgid "Failed to retrieve channels list"
+msgstr "Не удалось получить список каналов"
+
+msgctxt "#30041"
+msgid "Preparing EPG and channels list"
+msgstr "Подготовка EPG и списка каналов"
+
+msgctxt "#30042"
+msgid "Live now"
+msgstr "Сейчас"
+
+msgctxt "#30043"
+msgid "Archive - Week"
+msgstr "Архив за неделю"
+
+msgctxt "#30044"
+msgid "Choose any time"
+msgstr "Выберите любое время"
+
+msgctxt "#30045"
+msgid "Details"
+msgstr "Информация"
+
+msgctxt "#30046"
+msgid "Remove from beloved"
+msgstr "Удалить из любимых"
+
+msgctxt "#30047"
+msgid "Add to beloved"
+msgstr "Добавить к любимым"
+
+msgctxt "#30048"
+msgid "Next"
+msgstr "Далее"
+
+msgctxt "#30049"
+msgid "Failed to get channel stream URL"
+msgstr "Не удалось получить ссылку на канал"
+
+msgctxt "#30050"
+msgid "Programme"
+msgstr "Программа"
+
+msgctxt "#30051"
+msgid "Specify date [DD/MM/YYYY]"
+msgstr "Введите дату [ДД/ММ/ГГГГ]"
+
+msgctxt "#30052"
+msgid "Specify time [ЧЧ:ММ]"
+msgstr "Введите время [HH:MM]"
+
+msgctxt "#30053"
+msgid "This is the future!"
+msgstr "Это будущее!"
+
+msgctxt "#30054"
+msgid "Monday"
+msgstr "Понедельник"
+
+msgctxt "#30055"
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgctxt "#30056"
+msgid "Wednesday"
+msgstr "Среда"
+
+msgctxt "#30057"
+msgid "Thursday"
+msgstr "Четверг"
+
+msgctxt "#30058"
+msgid "Friday"
+msgstr "Пятница"
+
+msgctxt "#30059"
+msgid "Saturday"
+msgstr "Суббота"
+
+msgctxt "#30060"
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgctxt "#30061"
+msgid "Unknown error"
+msgstr "Неизвестная ошибка"
+
+msgctxt "#30062"
+msgid "Try later"
+msgstr "Попробуйте позже"
+
+msgctxt "#30063"
+msgid "Downloading selected day's EPG"
+msgstr "Получаю EPG для выбранного дня"
+
+msgctxt "#30064"
+msgid "Failed to get EPG for the selected day"
+msgstr "Ошибка получения EPG для выбранного дня"
+
+msgctxt "#30065"
+msgid "EPG not found"
+msgstr "EPG не найден"
+
+msgctxt "#30066"
+msgid "Later today"
+msgstr "Далее сегодня"
+
+msgctxt "#30067"
+msgid "Media Category"
+msgstr "Категории"
+
+msgctxt "#30068"
+msgid "Loading media list"
+msgstr "Список загружается"
+
+msgctxt "#30069"
+msgid "Previous page"
+msgstr "Предыдущая страница"
+
+msgctxt "#30070"
+msgid "Sort By"
+msgstr "Сорт.по"
+
+msgctxt "#30071"
+msgid "Name"
+msgstr "Названию"
+
+msgctxt "#30072"
+msgid "Date added"
+msgstr "Дате добавления"
+
+msgctxt "#30073"
+msgid "Rating"
+msgstr "По рейтингу"
+
+msgctxt "#30074"
+msgid "Last viewed"
+msgstr "Последние просмотренные"
+
+msgctxt "#30075"
+msgid "Top"
+msgstr "Топу"
+
+msgctxt "#30076"
+msgid "Next page"
+msgstr "Следующая страница"
+
+msgctxt "#30077"
+msgid "Episodes"
+msgstr "Эпизодов"
+
+msgctxt "#30078"
+msgid "Token error"
+msgstr "Ошибка токена"
+
+msgctxt "#30079"
+msgid "Failed to get media file URL"
+msgstr "Не удалось получить ссылку на медиа файл"
+
+msgctxt "#30080"
+msgid "Password to enable XXX channels"
+msgstr "Пароль для XXX каналов"
+
+msgctxt "#30081"
+msgid "Week day"
+msgstr "День недели"
+
+msgctxt "#30082"
+msgid "Minutes"
+msgstr "Минуты"
+
+msgctxt "#30083"
+msgid "Hours"
+msgstr "Часы"
+
+msgctxt "#30084"
+msgid "Execute"
+msgstr "Когда запускать?"
+
+msgctxt "#30085"
+msgid "Daily"
+msgstr "Раз в сутки"
+
+msgctxt "#30086"
+msgid "Weekly"
+msgstr "Раз в неделю"
+
+msgctxt "#30087"
+msgid "Su"
+msgstr "Вс"
+
+msgctxt "#30088"
+msgid "Mo"
+msgstr "Пн"
+
+msgctxt "#30089"
+msgid "Tu"
+msgstr "Вт"
+
+msgctxt "#30090"
+msgid "We"
+msgstr "Ср"
+
+msgctxt "#30091"
+msgid "Th"
+msgstr "Чт"
+
+msgctxt "#30092"
+msgid "Fr"
+msgstr "Пт"
+
+msgctxt "#30093"
+msgid "Sa"
+msgstr "Сб"
+
+msgctxt "#30094"
+msgid "Enable EPG update scheduler"
+msgstr "Активировать планировщик обновления EPG"
+
+msgctxt "#30095"
+msgid "EPG auto-update"
+msgstr "Автообновление EPG"
+
+msgctxt "#30096"
+msgid "Hours to keep EPG"
+msgstr "Сколько часов хранить EPG"
+
+msgctxt "#30097"
+msgid "Keep local EPG"
+msgstr "Хранить EPG локально"
+
+msgctxt "#30098"
+msgid "Programmes in short EPG"
+msgstr "Краткий анонс EPG"
+
+msgctxt "#30099"
+msgid "Show EPG?"
+msgstr "Отображать EPG?"
+
+msgctxt "#30100"
+msgid "Show Media Library"
+msgstr "Активировать медиатеку"
+
+msgctxt "#30101"
+msgid "Stream server"
+msgstr "Сервер потокового видео"
+
+msgctxt "#30102"
+msgid "Timezone"
+msgstr "Часовой пояс"
+
+msgctxt "#30103"
+msgid "Username"
+msgstr "Логин"
+
+msgctxt "#30104"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "#30105"
+msgid "Multiroom device number"
+msgstr "Мультирум: номер устройства"
+
+msgctxt "#30106"
+msgid "EPG last update time"
+msgstr "Время последнего обновления EPG"
+
+msgctxt "#30107"
+msgid "Search"
+msgstr "Поиск"
+
+msgctxt "#30108"
+msgid "All genres"
+msgstr "Все жанры"
+
+msgctxt "#30109"
+msgid "Name/Actor/Director/Year"
+msgstr "Название/Актёр/Режиссёр/Год"
+
+msgctxt "#30110"
+msgid "Year"
+msgstr "Год"
+
+msgctxt "#30111"
+msgid "Search in"
+msgstr "Искать в"
+
+msgctxt "#30112"
+msgid "Enter year"
+msgstr "Введите год"
+
+msgctxt "#30113"
+msgid "Search string (min. 3 symbols)"
+msgstr "Что искать? (мин. 3 символа)"
+
+msgctxt "#30114"
+msgid "Wrong year"
+msgstr "Некорректный год"
+
+msgctxt "#30115"
+msgid "Too short search string"
+msgstr "Слишком короткая строка поиска"
+
+msgctxt "#30116"
+msgid "Input error"
+msgstr "Ошибка ввода"
+
+msgctxt "#30117"
+msgid "Use aggressive EPG load"
+msgstr "Агрессивная загрузка EPG"
+
+msgctxt "#30118"
+msgid "Remove local EPG cache"
+msgstr "Удалить локальный EPG кеш"
+
+msgctxt "#30119"
+msgid "Show EPG"
+msgstr "Показать EPG (телегид)"
+
+msgctxt "#30120"
+msgid "Today"
+msgstr "Сегодня"
+
+msgctxt "#30121"
+msgid "Tomorrow"
+msgstr "Завтра"
+
+msgctxt "#30122"
+msgid "After tomorrow"
+msgstr "Послезавтра"
+
+msgctxt "#30123"
+msgid "Play from start"
+msgstr "Воспроизвести с начала"
+
+msgctxt "#30124"
+msgid "Refresh"
+msgstr "Обновить"
+
+msgctxt "#30125"
+msgid "Archive - Today"
+msgstr "Архив за сегодня"
+
+msgctxt "#30126"
+msgid "Stalker URL"
+msgstr "Адрес СТАЛКЕР портала"
+
+msgctxt "#30127"
+msgid "New stream server is"
+msgstr "Новый сервер потокового видео"
+
+msgctxt "#30128"
+msgid "Stream server"
+msgstr "Сервер потокового видео"
+
+msgctxt "#30129"
+msgid "Server response timeout (sec)"
+msgstr "Ожидание ответа от сервера (сек)"
+
+msgctxt "#30130"
+msgid "API Server"
+msgstr "API Сервер"
+
+msgctxt "#30131"
+msgid "Season"
+msgstr "Сезон"
+
+msgctxt "#30132"
+msgid "Episode"
+msgstr "Эпизод"
+
+msgctxt "#30133"
+msgid "Movie Information"
+msgstr "Информация о фильме"
+
+msgctxt "#30134"
+msgid "Description"
+msgstr "Описание"
+
+msgctxt "#30135"
+msgid "Year"
+msgstr "Год"
+
+msgctxt "#30136"
+msgid "Rating"
+msgstr "Рейтинг"
+
+msgctxt "#30137"
+msgid "Duration"
+msgstr "Длительность"
+
+msgctxt "#30138"
+msgid "min"
+msgstr "мин"
+
+msgctxt "#30139"
+msgid "Country"
+msgstr "Страна"
+
+msgctxt "#30140"
+msgid "Genre"
+msgstr "Жанр"
+
+msgctxt "#30141"
+msgid "Director"
+msgstr "Режиссер"
+
+msgctxt "#30142"
+msgid "Cast"
+msgstr "Актеры"
+
+msgctxt "#30143"
+msgid "Watch History"
+msgstr "История просмотров"
+
+msgctxt "#30144"
+msgid "Remove from history"
+msgstr "Удалить из истории"
+
+msgctxt "#30145"
+msgid "Clear all history"
+msgstr "Очистить всю историю"
+
+msgctxt "#30146"
+msgid "History is empty"
+msgstr "История пуста"
+
+msgctxt "#30147"
+msgid "History cleared"
+msgstr "История очищена"
+
+msgctxt "#30148"
+msgid "Season"
+msgstr "Сезон"
+
+msgctxt "#30149"
+msgid "Episode"
+msgstr "Эпизод"
+
+msgctxt "#30150"
+msgid "Removed from history"
+msgstr "Удалено из истории"
+
+msgctxt "#30151"
+msgid "Are you sure?"
+msgstr "Вы уверены?"
+
+msgctxt "#30152"
+msgid "Watch History"
+msgstr "История просмотров"
+
+msgctxt "#30153"
+msgid "History size"
+msgstr "Размер истории"
+
+msgctxt "#30154"
+msgid "Clear watch history"
+msgstr "Очистить историю просмотров"

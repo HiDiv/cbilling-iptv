@@ -1,0 +1,141 @@
+2.1.0 (2026-03-15)
+- Fix EPG timezone: display time now respects stb_timezone addon setting
+- EPG time derived from Unix timestamps only (API 'date' field in server TZ ignored)
+- EPG cache recalculates t_time/t_time_to from timestamps on read (TZ change works instantly)
+- Uses dateutil.tz from existing vendor for timezone conversion (no new dependencies)
+- Warning logged once at startup if timezone setting is empty or invalid (fallback to system time)
+- Affects: EPG in channel list, day EPG, archive EPG, fast EPG window
+- Fix SQLite "no such table: config" crash when config table lost from existing EPG database
+- Fix SQLite "NoneType is not callable" race condition between cron and UI threads
+- All SQLite connections now use timeout=10 and WAL journal mode for concurrent access
+- EPG config table uses CREATE IF NOT EXISTS + INSERT OR IGNORE for safe recovery
+- EPG reload uses INSERT ON CONFLICT UPDATE instead of plain UPDATE for missing rows
+- Added None connection guard in archive_channel_epg to prevent NoneType errors
+- VOD cache SQLite connections also updated with timeout=10
+- Watch history: episodes now navigate to season's episode list instead of direct playback
+- Episode list auto-positions cursor on the watched episode via Action(Down) emulation
+- Works correctly for single-season series (bypasses season selection)
+
+2.0.4-dev (2026-03-07)
+- Add Watch History feature for VOD (configurable size, default 5 items)
+- Add context menu for history items (remove, clear all)
+- Add settings for history management
+- Fix IPTV channel sorting to respect server order
+- Fix VOD pagination - now showing all items with "Next page" button
+- Fix "All genres" folder now displays content correctly
+- Fix urllib3 compatibility with Python 3.8 (Kodi 19.4)
+- Add client-side pagination (20 items per page)
+- Add debug logging for VOD operations
+- Improve episode/season name display (auto-generate when missing)
+
+2.0.3-dev (2026-02-24)
+- Fix EPG cache performance optimization
+- Remove blocking EPG reload on channel list open
+- EPG now loads instantly, cache updates in background
+
+2.0.2-dev (2026-02-24)
+- Fix Python 3.8 compatibility (Kodi 19/20)
+- Fix urllib3 type hints for older Python versions
+- Tested with Kodi 19.4 (Matrix) and Kodi 20 (Nexus)
+
+2.0.1-dev (2025-02-17)
+- Development version for testing API migration
+- This is a pre-release version
+
+2.0.0 (2025-02-17)
+- Migrate from Stalker Portal to new REST API
+- New API client (api_client.py) and data adapter (api_adapter.py)
+- Auth via x-public-key header (replaces Stalker handshake + bearer)
+- Stream URLs included directly from /streams (no create_link needed)
+- EPG from new API endpoints (/epg/now, /epg/current, /epg/{alias})
+- VOD from new API (/, /cat/, /video/, /season/)
+- Local favorites storage (favorites.json)
+- Remove ijson and dateutil dependencies
+- Remove login/password settings (replaced by public key)
+
+XX.3.0
+- Interface speed optimization
+- Fix VOD opening (added to the favorites) after token expiration
+
+XX.2.7
+- Improve auth error messaging
+
+1X.2.6
+- Fix API server URL (add option to modify it)
+
+1X.2.5
+- Fix EPG timeout issue
+- Add response timeout selection to the config
+- Add stream server selection to the context menu
+
+1X.2.4
+- Add Stalker URL to configs
+
+1X.2.3
+- Performance optimization
+- Minor fixes
+
+1X.2.2
+- Internal tech release
+
+1X.2.1
+- Fix local EPG cache validation (K19)
+- Fast EPG for next several days
+- Play live stream from the beginning
+- Fast switch to the Today's archive from menu
+- Focus last selected live channel on return
+
+1X.2.0
+- A lot of small fixes (mainly for Kodi 19); Code merge between Kodi 18 and Kodi 19
+
+19.1.0
+- Improve visibility and adopt addon to have a more original Kodi style look
+
+19.0.9
+- Fix wrong server selection in VoD
+- Sort beloved channels in alphabetical order
+
+19.0.8
+- Fix issue with EPG reload even if is not active
+- Minor fixes for new Kodi 19 beta1
+- New versioning model to support multiple Kodi versions
+
+2.0.7
+- Fix issue with cyrillic week day names for some devices
+
+2.0.6
+- Fix issues with multiroom subscription during interface operations
+
+2.0.5
+- Watched status icons in VoD
+- Option to delete local EPG cache file
+- Remove progress bar during channels load due to timeout issues
+
+2.0.4
+- Agressive EPG load
+- Fix crash in VoD due to wrong data in poster path
+
+2.0.3
+- Search in VoD
+- Fix VoD playback with short tokens
+- Language files
+
+2.0.2
+- VoD support
+
+2.0.1
+- Use server side favorites
+- Code optimization amd minor fixes
+
+2.0.0
+This version is based on the original "Cbilling IPTV" plugin
+- Advances EPG for live channels with local cache to speed-up load
+- Favorite channels      
+- Full day EPG for today's archive channel
+- Channel logos
+- Some beautifications
+- EPG during playback (use I icon)
+- New context menu for the live channels
+
+1.0.8
+- Check original "Cbilling IPTV" plugin history
