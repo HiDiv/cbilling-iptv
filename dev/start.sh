@@ -103,6 +103,42 @@ while [ $elapsed -lt $timeout ]; do
         -d '{"jsonrpc":"2.0","method":"JSONRPC.Ping","id":1}' \
         "http://localhost:${HTTP_PORT:-18080}/jsonrpc" > /dev/null 2>&1; then
         echo "Kodi is ready! (took ${elapsed}s)"
+
+        # Enable addon if disabled
+        ADDON_ENABLED=$(curl -sf -X POST -H "Content-Type: application/json" \
+            -d '{"jsonrpc":"2.0","method":"Addons.GetAddonDetails","params":{"addonid":"plugin.video.cbilling.iptv","properties":["enabled"]},"id":9}' \
+            "http://localhost:${HTTP_PORT:-18080}/jsonrpc" 2>/dev/null | grep -o '"enabled":[a-z]*' | cut -d: -f2)
+
+        if [ "$ADDON_ENABLED" = "false" ]; then
+            echo "Enabling addon..."
+            curl -sf -X POST -H "Content-Type: application/json" \
+                -d '{"jsonrpc":"2.0","method":"Addons.SetAddonEnabled","params":{"addonid":"plugin.video.cbilling.iptv","enabled":true},"id":10}' \
+                "http://localhost:${HTTP_PORT:-18080}/jsonrpc" > /dev/null 2>&1
+            sleep 2
+            echo "Addon enabled."
+        fi
+
+        # Auto-configure locale on first run (if not already Russian)
+        CURRENT_LANG=$(curl -sf -X POST -H "Content-Type: application/json" \
+            -d '{"jsonrpc":"2.0","method":"Settings.GetSettingValue","params":{"setting":"locale.language"},"id":11}' \
+            "http://localhost:${HTTP_PORT:-18080}/jsonrpc" 2>/dev/null | grep -o '"value":"[^"]*"' | cut -d'"' -f4)
+
+        if [ "$CURRENT_LANG" != "resource.language.ru_ru" ]; then
+            echo "Configuring Russian locale..."
+            sleep 3
+            curl -sf -X POST -H "Content-Type: application/json" \
+                -d '{"jsonrpc":"2.0","method":"Settings.SetSettingValue","params":{"setting":"locale.language","value":"resource.language.ru_ru"},"id":12}' \
+                "http://localhost:${HTTP_PORT:-18080}/jsonrpc" > /dev/null 2>&1
+            sleep 5
+            curl -sf -X POST -H "Content-Type: application/json" \
+                -d '{"jsonrpc":"2.0","method":"Settings.SetSettingValue","params":{"setting":"locale.timezone","value":"Europe/Moscow"},"id":13}' \
+                "http://localhost:${HTTP_PORT:-18080}/jsonrpc" > /dev/null 2>&1
+            curl -sf -X POST -H "Content-Type: application/json" \
+                -d '{"jsonrpc":"2.0","method":"Settings.SetSettingValue","params":{"setting":"locale.country","value":"Russia"},"id":14}' \
+                "http://localhost:${HTTP_PORT:-18080}/jsonrpc" > /dev/null 2>&1
+            echo "Locale configured (ru_RU, Europe/Moscow)."
+        fi
+
         exit 0
     fi
     sleep 2

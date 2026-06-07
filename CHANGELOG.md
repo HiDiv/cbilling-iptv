@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Fixed
 - VOD search pagination: page parameter now correctly passed to `/filter/by_name` and `/filter/year` API endpoints (issue [#1](https://github.com/HiDiv/cbilling-iptv/issues/1))
 
+### Added
+- Enhanced EPG info panel: current + next program with time ranges and elapsed/remaining info (issue [#3](https://github.com/HiDiv/cbilling-iptv/issues/3))
+- Setting "Show EPG in channel list" to toggle enhanced EPG panel (EPG → settings)
+- Dev environment for manual Kodi testing (`dev/` directory)
+
 ## [2.0.5-dev] - 2026-03-15
 
 ### Fixed

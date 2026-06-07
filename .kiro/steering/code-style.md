@@ -329,6 +329,65 @@ if not season_name:
 - String literals for user interface (UI strings) may be in Russian
 - Localization files (`resources/language/`) contain Russian text
 
+## Localization (CRITICALLY IMPORTANT)
+
+### Mandatory Requirement
+
+**ALL user-visible text MUST use the localization mechanism (`get_txt()` / `getLocalizedString()`).**
+
+### Rules
+
+1. **NEVER hardcode** user-visible strings (labels, messages, plot text) directly in Python code
+2. **ALWAYS** add new strings to both `resources/language/resource.language.ru_ru/strings.po` and `resources/language/resource.language.en_gb/strings.po`
+3. **Use `get_txt(XXXXX)`** where XXXXX is the string ID from strings.po
+4. **During code review** — reject any code that contains hardcoded Russian or English text shown to the user
+5. String IDs must be sequential, starting from the last used ID
+
+### What MUST be localized
+
+- Menu item labels
+- Dialog messages and titles
+- EPG format labels ("Сейчас:", "Далее:", etc.)
+- Time format strings ("мин.", "через", etc.)
+- Error messages shown to user
+- Setting labels (referenced by ID in settings.xml)
+
+### What does NOT need localization
+
+- Debug log messages (only visible to developers)
+- Code comments
+- Internal variable names
+- API parameters
+
+### Example
+
+```python
+# ❌ WRONG — hardcoded Russian text
+plot_parts.append("[B]Сейчас:[/B] %s" % title)
+plot_parts.append("(%d мин. идёт)" % elapsed)
+
+# ✅ CORRECT — localized strings
+plot_parts.append("[B]%s[/B] %s" % (get_txt(30156), title))
+plot_parts.append("(%s)" % (get_txt(30159) % elapsed))
+```
+
+### Adding a New String
+
+1. Find the last used ID in strings.po (e.g., 30160)
+2. Add to `resources/language/resource.language.ru_ru/strings.po`:
+   ```
+   msgctxt "#30161"
+   msgid "New label"
+   msgstr "Новый лейбл"
+   ```
+3. Add to `resources/language/resource.language.en_gb/strings.po`:
+   ```
+   msgctxt "#30161"
+   msgid "New label"
+   msgstr ""
+   ```
+4. Use in code: `get_txt(30161)`
+
 ## Testing
 
 ### Test Scripts
