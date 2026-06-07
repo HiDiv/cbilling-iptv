@@ -15,8 +15,11 @@
       <license>AGPL-3.0-only</license>
       <news>
 
-2.1.0 (unreleased)
+2.1.0 (2026-06-07)
 [fix] VOD search pagination: page parameter now passed to /filter/by_name and /filter/year API
+[new] Enhanced EPG info panel: current + next program with time ranges
+[new] Setting "Show EPG in channel list" (off by default)
+[info] Dev environment for manual Kodi testing
 
 2.0.5-dev
 [fix] EPG timezone: time now displays in user's configured timezone (stb_timezone setting)
