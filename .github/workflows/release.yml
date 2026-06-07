@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pytest pytest-cov pytz requests
+
+      - name: Run tests
+        run: pytest tests/unit/ tests/integration/ --tb=short
+
+      - name: Build addon ZIP
+        run: python build_addon.py
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: false
+          body: |
+            ## Cbilling.TV IPTV v${{ steps.version.outputs.VERSION }}
+
+            ### Installation
+
+            1. Download the ZIP file below
+            2. In Kodi: Settings → Add-ons → Install from zip file
+            3. Select the downloaded ZIP
+
+            ### Changes
+
+            See [CHANGELOG.md](https://github.com/HiDiv/cbilling-iptv/blob/main/CHANGELOG.md) for details.
+          files: dist/*.zip

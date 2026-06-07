@@ -4,15 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased] - 2.1.0
+## [2.1.0] - 2026-06-07
 
 ### Fixed
-- VOD search pagination: page parameter now correctly passed to `/filter/by_name` and `/filter/year` API endpoints (issue [#1](https://github.com/HiDiv/cbilling-iptv/issues/1))
+- VOD search pagination: page parameter now correctly passed to `/filter/by_name` and `/filter/year` API endpoints ([#1](https://github.com/HiDiv/cbilling-iptv/issues/1))
 
 ### Added
-- Enhanced EPG info panel: current + next program with time ranges and elapsed/remaining info (issue [#3](https://github.com/HiDiv/cbilling-iptv/issues/3))
+- Enhanced EPG info panel: current + next program with time ranges and elapsed/remaining info ([#3](https://github.com/HiDiv/cbilling-iptv/issues/3))
 - Setting "Show EPG in channel list" to toggle enhanced EPG panel (EPG → settings)
 - Dev environment for manual Kodi testing (`dev/` directory)
+- CI/CD: automatic release with addon ZIP on tag push
 
 ## [2.0.5-dev] - 2026-03-15
 
