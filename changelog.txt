@@ -1,5 +1,8 @@
 2.1.0 (unreleased)
 - Fix VOD search pagination: page parameter now passed to /filter/by_name and /filter/year API (issue #1)
+- Add enhanced EPG info panel with current + next program, time ranges, elapsed time (issue #3)
+- Add setting "Show EPG in channel list" (EPG section, off by default)
+- Add dev/ environment for manual Kodi testing
 
 2.0.5-dev (2026-03-15)
 - Fix EPG timezone: display time now respects stb_timezone addon setting

@@ -628,3 +628,27 @@ msgstr ""
 msgctxt "#30154"
 msgid "Clear watch history"
 msgstr ""
+
+msgctxt "#30155"
+msgid "Show EPG in channel list"
+msgstr ""
+
+msgctxt "#30156"
+msgid "Now:"
+msgstr ""
+
+msgctxt "#30157"
+msgid "Next:"
+msgstr ""
+
+msgctxt "#30158"
+msgid "Start:"
+msgstr ""
+
+msgctxt "#30159"
+msgid "%d min. elapsed"
+msgstr ""
+
+msgctxt "#30160"
+msgid "in %d min."
+msgstr ""

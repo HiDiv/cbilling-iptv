@@ -1540,11 +1540,14 @@ def get_channels_data(genre, fav_only="0"):
                 epg_ok = [0]
                 epg_fail = [0]
 
+                # Load 2 programs if EPG display in channel list is enabled (current + next)
+                epg_size = 2 if str(__addon__.getSetting("epg_in_channel_list")) == "true" else 1
+
                 def fetch_epg(channel):
                     alias = channel.get("id", "")
                     if alias:
                         try:
-                            epg_data = cbAdapter.get_short_epg(alias, size=1)
+                            epg_data = cbAdapter.get_short_epg(alias, size=epg_size)
                             if epg_data and len(epg_data) > 0:
                                 entry = epg_data[0]
                                 t_time = entry.get("t_time", "")
@@ -1552,6 +1555,8 @@ def get_channels_data(genre, fav_only="0"):
                                 descr = entry.get("descr", "")
                                 channel["cur_playing"] = ("%s %s" % (t_time, name)).strip() if (t_time or name) else ""
                                 channel["cur_playing_descr"] = descr
+                                # Store full short_epg for enhanced display
+                                channel["short_epg"] = epg_data
                                 if channel["cur_playing"]:
                                     epg_ok[0] += 1
                                 else:
@@ -1801,54 +1806,91 @@ def get_channels_list(group_id, favorites, action):
         epg_counter = 0
         plot_epg = ""
         plot_desc = ""
+        epg_current_program = ""
+        epg_next_program = ""
 
         if "short_epg" in channel:
             for epg_data in channel["short_epg"]:
                 epg_counter += 1
-                if epg_counter > 1:
+                if epg_counter == 1:
+                    # First entry = current program
+                    epg_current_program = epg_data
+                elif epg_counter == 2:
+                    # Second entry = next program
+                    epg_next_program = epg_data
+                    plot_epg += "[CR]%s: %s" % (epg_data["t_time"], epg_data["name"])
+                else:
                     plot_epg += "[CR]%s: %s" % (epg_data["t_time"], epg_data["name"])
 
-        # Parse EPG info: extract start time and title for label2 and plot
-        # label stays clean (channel_title_visual) so Kodi search/filter works correctly
+        # Build EPG info for label2 and inline label display
         channel_curr_epg_title = ""
         channel_curr_epg_start = ""
         epg_label2 = ""
         epg_progress_prc = None
+        epg_inline_text = ""
 
-        if channel_curr_epg and "NO CHANNEL INFO" not in channel_curr_epg.upper() and action != "archive":
-            regex = re.search(r"(\d{2}:\d{2})(.*)", channel_curr_epg)
-            if regex:
-                try:
-                    channel_curr_epg_start = regex.group(1)
-                    channel_curr_epg_title = regex.group(2)
+        # Try to get EPG from short_epg cache first (primary source)
+        if epg_current_program and action != "archive":
+            try:
+                channel_curr_epg_start = epg_current_program.get("t_time", "")
+                channel_curr_epg_title = epg_current_program.get("name", "")
+                t_time_to = epg_current_program.get("t_time_to", "")
+                start_ts = int(epg_current_program.get("start_timestamp", 0))
+                stop_ts = int(epg_current_program.get("stop_timestamp", 0))
 
-                    if (
-                        ("short_epg" in channel)
-                        and ("t_time" in channel["short_epg"][0])
-                        and (channel["short_epg"][0]["t_time"] == channel_curr_epg_start)
-                    ):
-                        epg_progress_prc = int(
-                            ((time.mktime(time.localtime()) - int(channel["short_epg"][0]["start_timestamp"])) * 100)
-                            / (
-                                int(channel["short_epg"][0]["stop_timestamp"])
-                                - int(channel["short_epg"][0]["start_timestamp"])
-                            )
-                        )
+                # Calculate progress percentage
+                if start_ts and stop_ts and stop_ts > start_ts:
+                    now_ts = int(time.mktime(time.localtime()))
+                    epg_progress_prc = int(((now_ts - start_ts) * 100) / (stop_ts - start_ts))
+                    if epg_progress_prc < 0:
+                        epg_progress_prc = 0
+                    elif epg_progress_prc > 100:
+                        epg_progress_prc = 100
+
+                # Build label2 text
+                if channel_curr_epg_start and channel_curr_epg_title:
+                    if epg_progress_prc is not None and t_time_to:
                         epg_label2 = "%s - %s (%s%%) | %s" % (
-                            channel["short_epg"][0]["t_time"],
-                            channel["short_epg"][0]["t_time_to"],
+                            channel_curr_epg_start,
+                            t_time_to,
                             str(epg_progress_prc),
                             channel_curr_epg_title.strip(),
                         )
                     else:
                         epg_label2 = "%s | %s" % (channel_curr_epg_start, channel_curr_epg_title.strip())
+
+                # Build inline EPG text (for embedding in label)
+                if channel_curr_epg_start and channel_curr_epg_title:
+                    epg_inline_text = "%s %s" % (channel_curr_epg_start, channel_curr_epg_title.strip())
+                    if epg_next_program:
+                        next_time = epg_next_program.get("t_time", "")
+                        next_name = epg_next_program.get("name", "")
+                        if next_time and next_name:
+                            epg_inline_text += "  |  %s %s" % (next_time, next_name.strip())
+            except:
+                pass
+
+        # Fallback: parse from cur_playing text if short_epg was not available
+        elif channel_curr_epg and "NO CHANNEL INFO" not in channel_curr_epg.upper() and action != "archive":
+            regex = re.search(r"(\d{2}:\d{2})(.*)", channel_curr_epg)
+            if regex:
+                try:
+                    channel_curr_epg_start = regex.group(1)
+                    channel_curr_epg_title = regex.group(2)
+                    epg_label2 = "%s | %s" % (channel_curr_epg_start, channel_curr_epg_title.strip())
+                    epg_inline_text = "%s %s" % (channel_curr_epg_start, channel_curr_epg_title.strip())
                 except:
                     pass
 
-        # Create ListItem with clean channel name for search/filter
-        # Do NOT call setLabel() with COLOR tags - Kodi uses label directly for search/filter
-        # EPG info goes to label2 (shown as second column in list view)
-        list_item = xbmcgui.ListItem(channel_title_visual, offscreen=True)
+        # Determine if EPG should be shown inline (in the channel label)
+        show_epg_in_list = str(__addon__.getSetting("epg_in_channel_list")) == "true"
+
+        # EPG display in standard Estuary WideList is limited to the info panel (left side)
+        # The label stays clean for search/filter compatibility
+        channel_label = channel_title_visual
+
+        # Create ListItem
+        list_item = xbmcgui.ListItem(channel_label, offscreen=True)
         if epg_label2:
             list_item.setLabel2(epg_label2)
 
@@ -1906,9 +1948,65 @@ def get_channels_list(group_id, favorites, action):
 
         if channel_has_archive:
             if action == "live":
-                plot_desc = "[COLOR moccasin][B]%s[/B]: %s[/COLOR]" % (get_txt(30042), channel_curr_epg_title.strip())
-                if epg_descr:
-                    plot_desc += "[CR][CR][COLOR white]%s[/COLOR]" % epg_descr.strip()
+                show_epg_in_list = str(__addon__.getSetting("epg_in_channel_list")) == "true"
+                if show_epg_in_list and channel_curr_epg_title.strip():
+                    # Enhanced EPG format for info panel
+                    plot_parts = []
+                    plot_parts.append(
+                        "[COLOR moccasin][B]%s[/B] %s[/COLOR]" % (get_txt(30156), channel_curr_epg_title.strip())
+                    )
+                    if channel_curr_epg_start:
+                        time_info = "%s %s" % (get_txt(30158), channel_curr_epg_start)
+                        if epg_current_program:
+                            t_time_to = epg_current_program.get("t_time_to", "")
+                            if t_time_to:
+                                time_info = "%s — %s" % (channel_curr_epg_start, t_time_to)
+                            start_ts = int(epg_current_program.get("start_timestamp", 0))
+                            stop_ts = int(epg_current_program.get("stop_timestamp", 0))
+                            if start_ts and stop_ts and stop_ts > start_ts:
+                                now_ts = int(time.mktime(time.localtime()))
+                                elapsed_min = (now_ts - start_ts) // 60
+                                if elapsed_min > 0:
+                                    time_info += " (%s)" % (get_txt(30159) % elapsed_min)
+                        plot_parts.append("[COLOR grey]%s[/COLOR]" % time_info)
+
+                    # Next program (shown before description)
+                    if epg_next_program:
+                        next_name = epg_next_program.get("name", "")
+                        next_start = epg_next_program.get("t_time", "")
+                        next_end = epg_next_program.get("t_time_to", "")
+                        if next_name:
+                            starts_in_str = ""
+                            next_start_ts = int(epg_next_program.get("start_timestamp", 0))
+                            if next_start_ts:
+                                now_ts = int(time.mktime(time.localtime()))
+                                starts_in_min = (next_start_ts - now_ts) // 60
+                                if starts_in_min > 0:
+                                    starts_in_str = " (%s)" % (get_txt(30160) % starts_in_min)
+                            plot_parts.append("")
+                            plot_parts.append("[COLOR burlywood][B]%s[/B] %s[/COLOR]" % (get_txt(30157), next_name))
+                            next_time = ""
+                            if next_start and next_end:
+                                next_time = "%s — %s" % (next_start, next_end)
+                            elif next_start:
+                                next_time = "%s %s" % (get_txt(30158), next_start)
+                            if next_time:
+                                plot_parts.append("[COLOR grey]%s%s[/COLOR]" % (next_time, starts_in_str))
+
+                    # Description last
+                    if epg_descr:
+                        plot_parts.append("")
+                        plot_parts.append(epg_descr.strip())
+
+                    plot_desc = "[CR]".join(plot_parts)
+                else:
+                    # Original format
+                    plot_desc = "[COLOR moccasin][B]%s[/B]: %s[/COLOR]" % (
+                        get_txt(30042),
+                        channel_curr_epg_title.strip(),
+                    )
+                    if epg_descr:
+                        plot_desc += "[CR][CR][COLOR white]%s[/COLOR]" % epg_descr.strip()
                 context_menu.append(
                     (
                         "[B]%s[/B]" % get_txt(30125),
@@ -1953,9 +2051,66 @@ def get_channels_list(group_id, favorites, action):
                     )
         else:
             if channel_curr_epg and "NO CHANNEL INFO" not in channel_curr_epg.upper() and action == "live":
-                plot_desc = "[COLOR moccasin][B]%s[/B]: %s[/COLOR]" % (get_txt(30042), channel_curr_epg_title.strip())
-                if epg_descr:
-                    plot_desc += "[CR][CR][COLOR white]%s[/COLOR]" % epg_descr.strip()
+                show_epg_in_list = str(__addon__.getSetting("epg_in_channel_list")) == "true"
+                if show_epg_in_list:
+                    # Enhanced format: time range + remaining + description
+                    plot_parts = []
+                    plot_parts.append("[COLOR moccasin][B]Сейчас:[/B] %s[/COLOR]" % channel_curr_epg_title.strip())
+                    if channel_curr_epg_start:
+                        time_info = channel_curr_epg_start
+                        # Add end time and remaining from short_epg if available
+                        if epg_current_program:
+                            t_time_to = epg_current_program.get("t_time_to", "")
+                            if t_time_to:
+                                time_info = "%s — %s" % (channel_curr_epg_start, t_time_to)
+                            start_ts = int(epg_current_program.get("start_timestamp", 0))
+                            stop_ts = int(epg_current_program.get("stop_timestamp", 0))
+                            if start_ts and stop_ts and stop_ts > start_ts:
+                                now_ts = int(time.mktime(time.localtime()))
+                                remaining_min = (stop_ts - now_ts) // 60
+                                if remaining_min > 0:
+                                    time_info += " (%d мин. ост.)" % remaining_min
+                        plot_parts.append("[COLOR grey]%s[/COLOR]" % time_info)
+
+                    if epg_descr:
+                        plot_parts.append("")
+                        plot_parts.append(epg_descr.strip())
+
+                    # Next program from plot_epg or epg_next_program
+                    if epg_next_program:
+                        next_name = epg_next_program.get("name", "")
+                        next_start = epg_next_program.get("t_time", "")
+                        next_end = epg_next_program.get("t_time_to", "")
+                        if next_name:
+                            starts_in_str = ""
+                            next_start_ts = int(epg_next_program.get("start_timestamp", 0))
+                            if next_start_ts:
+                                now_ts = int(time.mktime(time.localtime()))
+                                starts_in_min = (next_start_ts - now_ts) // 60
+                                if starts_in_min > 0:
+                                    starts_in_str = " (через %d мин.)" % starts_in_min
+                            plot_parts.append("")
+                            plot_parts.append("[COLOR burlywood][B]Далее:[/B] %s[/COLOR]" % next_name)
+                            next_time = ""
+                            if next_start and next_end:
+                                next_time = "%s — %s" % (next_start, next_end)
+                            elif next_start:
+                                next_time = next_start
+                            if next_time:
+                                plot_parts.append("[COLOR grey]%s%s[/COLOR]" % (next_time, starts_in_str))
+                    elif plot_epg:
+                        plot_parts.append("")
+                        plot_parts.append("[B]%s[/B]:%s" % (get_txt(30048), plot_epg))
+
+                    plot_desc = "[CR]".join(plot_parts)
+                else:
+                    # Original compact format
+                    plot_desc = "[COLOR moccasin][B]%s[/B]: %s[/COLOR]" % (
+                        get_txt(30042),
+                        channel_curr_epg_title.strip(),
+                    )
+                    if epg_descr:
+                        plot_desc += "[CR][CR][COLOR white]%s[/COLOR]" % epg_descr.strip()
 
         context_menu.append(
             (
@@ -2005,7 +2160,7 @@ def get_channels_list(group_id, favorites, action):
 
         # Info and beauty
         if action == "live":
-            if len(plot_epg) > 1:
+            if len(plot_epg) > 1 and not plot_desc:
                 plot_desc += "[CR][CR][B]%s[/B]:%s" % (get_txt(30048), plot_epg)
 
             # Use clean channel name for search/filter, sorttitle for case-insensitive sorting
@@ -2035,7 +2190,6 @@ def get_channels_list(group_id, favorites, action):
             try:
                 list_item.setArt(
                     {
-                        "poster": tv_logo_original,
                         "thumb": tv_logo_small,
                         "fanart": os.path.join(FANART_PATH, "live_02.jpg"),
                     }
@@ -2043,7 +2197,6 @@ def get_channels_list(group_id, favorites, action):
             except:
                 list_item.setArt(
                     {
-                        "poster": tv_poster_file,
                         "thumb": thumb_play_file,
                         "fanart": os.path.join(FANART_PATH, "live_02.jpg"),
                     }

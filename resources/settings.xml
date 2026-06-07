@@ -14,7 +14,8 @@
 <category label="EPG">
    <setting label="30099" type="bool" id="load_next_epg" default="true"/>
    <setting label="30098" type="slider" id="next_epg_limit" default="1" range="1,1,5" option="int" enable="eq(-1,true)" subsetting="true" />
-   <setting label="30097" type="bool" id="epg_cache" default="true" enable="eq(-2,true)" />
+   <setting label="30155" type="bool" id="epg_in_channel_list" default="false" enable="eq(-2,true)" subsetting="true" />
+   <setting label="30097" type="bool" id="epg_cache" default="true" enable="eq(-3,true)" />
    <setting label="30096" type="slider" id="epg_cache_hours" default="8" range="4,4,120" option="int" enable="eq(-1,true)" subsetting="true" />
    <setting type="lsep" label="30095" />
    <setting label="30094" type="bool" id="epg_cron" default="false" />

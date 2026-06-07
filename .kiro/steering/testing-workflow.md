@@ -29,6 +29,7 @@ tests/
 │   └── test_urllib3_import.py         # urllib3 import
 └── integration/
     ├── __init__.py
+    ├── test_epg_channel_list.py       # EPG in channel list (issue #3)
     ├── test_sqlite_robustness.py      # SQLite robustness
     └── test_vod_search_pagination.py  # VOD search/year filter pagination (issue #1)
 ```
