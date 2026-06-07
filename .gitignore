@@ -51,6 +51,9 @@ swagger-docs.json
 # E2E test artifacts
 tests/e2e/artifacts/
 
+# Dev environment runtime data (settings may contain secrets)
+dev/kodi_data/
+
 # Temporary files
 temp/
 .gitignore.proposed

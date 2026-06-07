@@ -15,7 +15,10 @@
       <license>AGPL-3.0-only</license>
       <news>
 
-2.1.0
+2.1.0 (unreleased)
+[fix] VOD search pagination: page parameter now passed to /filter/by_name and /filter/year API
+
+2.0.5-dev
 [fix] EPG timezone: time now displays in user's configured timezone (stb_timezone setting)
 [fix] EPG time from API 'date' field (server timezone) is now ignored, Unix timestamps used instead
 [fix] EPG cache: t_time/t_time_to recalculated from timestamps on read (timezone change works instantly)

@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [2.1.0] - 2026-03-15
+## [Unreleased] - 2.1.0
+
+### Fixed
+- VOD search pagination: page parameter now correctly passed to `/filter/by_name` and `/filter/year` API endpoints (issue [#1](https://github.com/HiDiv/cbilling-iptv/issues/1))
+
+## [2.0.5-dev] - 2026-03-15
 
 ### Fixed
 - EPG timezone: display time now respects `stb_timezone` addon setting

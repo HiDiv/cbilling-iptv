@@ -6,6 +6,28 @@ fileMatchPattern: "body.py"
 
 # Recent Bug Fixes
 
+## 2026-06-07: VOD Search Pagination Fix (issue #1)
+
+### Problem
+Search by name and filter by year did not pass `page` parameter to API.
+Clicking "Next page" loaded the same results again.
+
+### Root Cause
+- `search_by_name()` and `filter_by_year()` in `api_client.py` had no `page`/`per_page` params
+- `vod_get_ordered_list()` in `body.py` did not pass `page_nr` to these methods
+- API returned paginated response with `meta`, so "Next page" button appeared, but
+  subsequent calls still fetched page 1
+
+### Fix
+1. Added `page` and `per_page` parameters to `search_by_name()` and `filter_by_year()`
+2. Pass `page_nr` from `vod_get_ordered_list()` to these methods
+3. Added integration tests confirming pages return different results
+
+### Files Changed
+- `resources/lib/api_client.py` — added pagination params
+- `resources/lib/body.py` — pass `page=page_nr` in search/year branches
+- `tests/integration/test_vod_search_pagination.py` — new regression tests
+
 ## 2026-02-18 (evening): Series and Archive Fixes
 
 ### 1. Series with one season (re-fix)

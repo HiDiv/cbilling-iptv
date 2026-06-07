@@ -1,4 +1,7 @@
-2.1.0 (2026-03-15)
+2.1.0 (unreleased)
+- Fix VOD search pagination: page parameter now passed to /filter/by_name and /filter/year API (issue #1)
+
+2.0.5-dev (2026-03-15)
 - Fix EPG timezone: display time now respects stb_timezone addon setting
 - EPG time derived from Unix timestamps only (API 'date' field in server TZ ignored)
 - EPG cache recalculates t_time/t_time_to from timestamps on read (TZ change works instantly)

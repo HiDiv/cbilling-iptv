@@ -29,7 +29,8 @@ tests/
 │   └── test_urllib3_import.py         # urllib3 import
 └── integration/
     ├── __init__.py
-    └── test_sqlite_robustness.py      # SQLite robustness
+    ├── test_sqlite_robustness.py      # SQLite robustness
+    └── test_vod_search_pagination.py  # VOD search/year filter pagination (issue #1)
 ```
 
 ## Testing Dependencies
@@ -165,18 +166,53 @@ python3 -m pytest tests/unit/test_api_adapter.py::test_ts_to_local_str -v
 
 ### 1. Automated tests (first priority)
 - Run `python3 -m pytest tests/ --tb=short`
-- All 77+ tests should pass
+- All 153+ tests should pass
 - API-dependent tests are skipped without `.env`
+- Integration tests with API: `python3 -m pytest tests/ -m api --tb=short`
 
 ### 2. Kodi log analysis (second priority)
 - Read `kodi.log` to understand issues
 - Search for `[Cbilling]` or addon name entries
 - Analyze errors and tracebacks
 
-### 3. Testing in Kodi (last priority)
-- **ONLY** after fixing all possible errors through tests
+### 3. Manual testing in Kodi via dev environment (third priority)
+- Use `./dev/start.sh` to launch Kodi with addon mounted
+- Source code changes apply immediately (next plugin:// call)
+- View logs: `./dev/logs.sh addon`
+- **ONLY** after fixing all possible errors through automated tests
 - **ONLY** with explicit user permission
-- This is the final stage before release
+
+### 4. E2E tests (before release)
+- Run `make e2e` for full cycle (build ZIP → start container → run tests → stop)
+- Requires Docker and API credentials
+
+## Dev Environment for Manual Testing
+
+The `dev/` directory provides a self-contained Kodi environment:
+
+```bash
+# One-time host setup (X11 access)
+./dev/setup-host.sh
+
+# Start Kodi 20 in window
+./dev/start.sh
+
+# View addon logs
+./dev/logs.sh addon
+
+# Stop
+./dev/stop.sh
+
+# Reset all data (clean slate)
+./dev/reset.sh
+```
+
+**Key details:**
+- Docker images: `ghcr.io/hidiv/kodi-docker:kodi20-v0.1.0`
+- Addon source mounted read-only (changes picked up on next navigation)
+- `dev/kodi_data/` stores persistent data (EPG, cache, settings) — gitignored
+- Settings auto-provisioned from `.env` on first run
+- Logs always at `dev/kodi_data/temp/kodi.log`
 
 ## Writing New Tests
 
