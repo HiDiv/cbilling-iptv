@@ -20,7 +20,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install pytest pytest-cov pytz requests
+        run: pip install pytest pytest-cov pytest-timeout pytz requests websockets
 
       - name: Run tests
         run: pytest tests/unit/ tests/integration/ --tb=short
