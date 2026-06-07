@@ -5,10 +5,18 @@ inclusion: auto
 
 # Cbilling IPTV Kodi Addon — Project Context
 
+## Repository
+
+- **GitHub:** https://github.com/HiDiv/cbilling-iptv
+- **Owner:** HiDiv
+- **Repo name:** cbilling-iptv
+- **Visibility:** Public
+- **License:** AGPL-3.0-only
+
 ## Current Status
 
 **Version:** 2.0.4-dev
-**Status:** New API migration complete, preparing for GitHub publication
+**Status:** Published on GitHub, active development
 
 ## Architecture
 
@@ -62,7 +70,11 @@ Stored locally in favorites.json (no API endpoint)
 - Loads only 1 day for speed
 - Updated via cron
 
-## Known Issues (resolved)
+## Known Issues
+
+1. 🔴 [#1](https://github.com/HiDiv/cbilling-iptv/issues/1) VOD search pagination broken — page param not passed to API
+
+### Resolved
 
 1. ✅ Series with 1 season — now shows episodes directly
 2. ✅ Archive showed 1 day instead of 7 — day calculation fixed
@@ -85,4 +97,4 @@ python3 build_addon.py
 ```
 
 ---
-Last updated: 2026-02-18
+Last updated: 2026-06-07
