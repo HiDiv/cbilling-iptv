@@ -6,11 +6,17 @@ labels: bug
 assignees: ''
 ---
 
+**Before submitting, please confirm:**
+
+- [ ] I am using the latest addon version
+- [ ] I have searched existing issues and this is not a duplicate
+
 ## Environment
 
-- **Kodi version:** (e.g., 19.x / 20.x / 21.x)
-- **Operating system:** (e.g., Windows 11, Ubuntu 22.04, LibreELEC 11, Android 13)
-- **Addon version:** (e.g., 2.1.0)
+- **Kodi version:** (e.g., 19.4 / 20.5 / 21.1)
+- **Operating system:** (e.g., Windows 11, Ubuntu 22.04, LibreELEC 12, Android 14)
+- **Addon version:** (e.g., 2.0.4)
+- **IPTV server:** (if relevant)
 
 ## Steps to Reproduce
 
@@ -20,24 +26,29 @@ assignees: ''
 
 ## Expected Behavior
 
-A clear description of what you expected to happen.
+What you expected to happen.
 
 ## Actual Behavior
 
-A clear description of what actually happened.
+What actually happened instead.
 
 ## Relevant Log Output
 
 <details>
-<summary>Kodi log</summary>
+<summary>Kodi log (click to expand)</summary>
+
+To get the debug log:
+1. Enable debug logging: Kodi Settings → System → Logging → Enable debug logging
+2. Reproduce the issue
+3. Find the log: Kodi Settings → System → Logging → Show log file
+4. Paste the relevant `[Cbilling]` lines below:
 
 ```
-Paste relevant log output here.
-You can find the log at: Kodi Settings → System → Logging → Show log file
+Paste log output here
 ```
 
 </details>
 
 ## Additional Context
 
-Add any other context about the problem here (screenshots, configuration, etc.).
+Any other relevant info: screenshots, specific content that triggers the issue, addon settings, etc.
