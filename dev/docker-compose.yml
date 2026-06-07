@@ -1,0 +1,58 @@
+# Dev environment for manual addon testing in Kodi.
+#
+# Usage:
+#   ./dev/start.sh                  — Kodi 20 windowed (default)
+#   ./dev/start.sh headless         — Kodi 20 headless (VNC/noVNC access)
+#   ./dev/start.sh windowed kodi21  — Kodi 21 windowed
+#
+# Addon source is mounted directly (no ZIP build needed).
+# Settings are provisioned from .env automatically.
+
+x-kodi-common: &kodi-common
+  environment:
+    KODI_MODE: ${KODI_MODE:-windowed}
+    KODI_RESOLUTION: ${KODI_RESOLUTION:-1280x720}
+    ENABLE_VNC: "true"
+    ENABLE_NOVNC: "true"
+    TZ: ${TZ:-Europe/Moscow}
+  volumes:
+    # Kodi data directory (persistent between runs)
+    - ./kodi_data:/root/.kodi
+    # Addon source (read-only) — overlays the addon in addons/
+    # Changes picked up on next plugin:// call (fresh Python process)
+    - ..:/root/.kodi/addons/plugin.video.cbilling.iptv:ro
+    # Config overlay (applied by entrypoint on start)
+    - ./config:/config:ro
+  ports:
+    - "${HTTP_PORT:-18080}:8080"
+    - "${WS_PORT:-19090}:9090"
+    - "${VNC_PORT:-15900}:5900"
+    - "${NOVNC_PORT:-18000}:8000"
+  healthcheck:
+    test: >-
+      curl -sf -X POST -H "Content-Type: application/json"
+      -d '{"jsonrpc":"2.0","method":"JSONRPC.Ping","id":1}'
+      http://localhost:8080/jsonrpc || exit 1
+    interval: 10s
+    timeout: 5s
+    retries: 5
+    start_period: 30s
+
+services:
+  kodi20:
+    <<: *kodi-common
+    image: ${KODI20_IMAGE:-ghcr.io/hidiv/kodi-docker:kodi20-v0.1.0}
+    profiles: ["kodi20"]
+    container_name: cbilling-dev-kodi20
+
+  kodi21:
+    <<: *kodi-common
+    image: ${KODI21_IMAGE:-ghcr.io/hidiv/kodi-docker:kodi21-v0.1.0}
+    profiles: ["kodi21"]
+    container_name: cbilling-dev-kodi21
+
+  kodi19:
+    <<: *kodi-common
+    image: ${KODI19_IMAGE:-ghcr.io/hidiv/kodi-docker:kodi19-v0.1.0}
+    profiles: ["kodi19"]
+    container_name: cbilling-dev-kodi19

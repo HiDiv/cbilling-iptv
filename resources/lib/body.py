@@ -3286,14 +3286,14 @@ def vod_get_ordered_list(cat_id, genre_id, page_nr, sortby, vod_search, vod_year
             search_term = (sys.version_info[0] >= 3 and urlUnquote(vod_search)) or unicode(
                 urlUnquote(vod_search), "utf-8"
             )
-            raw_data = cbAPI.search_by_name(search_term)
+            raw_data = cbAPI.search_by_name(search_term, page=page_nr)
             func_smart = "vod_search=%s" % vod_search
-            debug_log('[vod_get_ordered_list] Search mode: "%s"' % search_term)
+            debug_log('[vod_get_ordered_list] Search mode: "%s", page=%d' % (search_term, page_nr))
         elif vod_year != None:
             year_val = urlUnquote(vod_year)
-            raw_data = cbAPI.filter_by_year(year_val)
+            raw_data = cbAPI.filter_by_year(year_val, page=page_nr)
             func_smart = "vod_year=%s" % vod_year
-            debug_log("[vod_get_ordered_list] Year filter mode: %s" % year_val)
+            debug_log("[vod_get_ordered_list] Year filter mode: %s, page=%d" % (year_val, page_nr))
         elif genre_id != "*" and genre_id != "0":
             raw_data = cbAPI.get_vod_by_genre(genre_id, page=page_nr)
             debug_log("[vod_get_ordered_list] Genre mode: genre_id=%s, page=%d" % (genre_id, page_nr))

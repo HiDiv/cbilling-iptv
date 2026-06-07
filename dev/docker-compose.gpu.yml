@@ -1,0 +1,54 @@
+# GPU + X11 + Audio override for windowed/fullscreen modes.
+# Merged automatically by start.sh when mode != headless.
+
+services:
+  kodi19:
+    runtime: nvidia
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      PULSE_SERVER: unix:/tmp/pulseaudio.socket
+    devices:
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD129:/dev/dri/renderD129
+    group_add:
+      - video
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${PULSE_SOCKET:-/run/user/1000/pulse/native}:/tmp/pulseaudio.socket
+      - ${HOME}/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+
+  kodi20:
+    runtime: nvidia
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      PULSE_SERVER: unix:/tmp/pulseaudio.socket
+    devices:
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD129:/dev/dri/renderD129
+    group_add:
+      - video
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${PULSE_SOCKET:-/run/user/1000/pulse/native}:/tmp/pulseaudio.socket
+      - ${HOME}/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+
+  kodi21:
+    runtime: nvidia
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      PULSE_SERVER: unix:/tmp/pulseaudio.socket
+    devices:
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD129:/dev/dri/renderD129
+    group_add:
+      - video
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${PULSE_SOCKET:-/run/user/1000/pulse/native}:/tmp/pulseaudio.socket
+      - ${HOME}/.config/pulse/cookie:/root/.config/pulse/cookie:ro

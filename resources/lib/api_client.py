@@ -381,33 +381,40 @@ class CbillingAPI:
     # Filter / Search endpoints
     # ------------------------------------------------------------------
 
-    def search_by_name(self, name):
+    def search_by_name(self, name, page=1, per_page=20):
         """
         GET /filter/by_name?name=X - Search videos by name.
 
         Args:
             name: Search query string
+            page: Page number (default 1)
+            per_page: Number of items per page (default 20)
 
         Returns:
-            list of matching videos
+            dict with 'data' list and 'meta' pagination info
         """
-        return self._request("/filter/by_name", params={"name": name})
+        return self._request("/filter/by_name", params={"name": name, "page": page, "per_page": per_page})
 
     def filter_new(self):
         """GET /filter/new - Get recently added videos."""
         return self._request("/filter/new")
 
-    def filter_by_year(self, year, end_year=None):
+    def filter_by_year(self, year, end_year=None, page=1, per_page=20):
         """
         GET /filter/year/{year} or /filter/year/{start}/{end}
 
         Args:
             year: Year or start year
             end_year: End year (optional, for range)
+            page: Page number (default 1)
+            per_page: Number of items per page (default 20)
         """
         if end_year:
-            return self._request("/filter/year/%s/%s" % (str(year), str(end_year)))
-        return self._request("/filter/year/%s" % str(year))
+            return self._request(
+                "/filter/year/%s/%s" % (str(year), str(end_year)),
+                params={"page": page, "per_page": per_page},
+            )
+        return self._request("/filter/year/%s" % str(year), params={"page": page, "per_page": per_page})
 
     def filter_by_letter(self, letter):
         """GET /filter/alpha/{letter} - Filter by first letter."""

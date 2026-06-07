@@ -15,7 +15,8 @@ inclusion: auto
 
 ## Current Status
 
-**Version:** 2.0.4-dev
+**Version:** 2.1.0 (unreleased, in development)
+**Last released:** 2.0.5-dev
 **Status:** Published on GitHub, active development
 
 ## Architecture
@@ -72,13 +73,12 @@ Stored locally in favorites.json (no API endpoint)
 
 ## Known Issues
 
-1. 🔴 [#1](https://github.com/HiDiv/cbilling-iptv/issues/1) VOD search pagination broken — page param not passed to API
-
 ### Resolved
 
-1. ✅ Series with 1 season — now shows episodes directly
-2. ✅ Archive showed 1 day instead of 7 — day calculation fixed
-3. ✅ Slow EPG loading — now loads only 1 day
+1. ✅ [#1](https://github.com/HiDiv/cbilling-iptv/issues/1) VOD search pagination — fixed (page param now passed to API)
+2. ✅ Series with 1 season — now shows episodes directly
+3. ✅ Archive showed 1 day instead of 7 — day calculation fixed
+4. ✅ Slow EPG loading — now loads only 1 day
 
 ## Development Commands
 

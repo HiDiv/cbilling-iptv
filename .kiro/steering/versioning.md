@@ -50,6 +50,7 @@ No exceptions. Always ask the user.
 
 ## Current Version
 
-Current version: **2.0.4-dev**
+Current version: **2.1.0** (unreleased, in development)
+Last released version: **2.0.5-dev**
 
-Last updated: 2026-03-02
+Last updated: 2026-06-07
