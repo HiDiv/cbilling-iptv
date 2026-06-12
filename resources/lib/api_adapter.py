@@ -13,13 +13,9 @@ Key transformations:
   - Archive URL construction from stream alias + timestamp
 """
 
+import contextlib
 import datetime
 import re
-
-try:
-    import simplejson as json
-except ImportError:
-    pass
 
 try:
     from dateutil.tz import gettz, tzutc
@@ -342,10 +338,8 @@ class ApiAdapter:
 
             # Fallback to 'date' string only if no timestamp available
             if not t_time and "date" in epg_data:
-                try:
+                with contextlib.suppress(IndexError, AttributeError):
                     t_time = epg_data["date"].split(" ")[1][:5]
-                except (IndexError, AttributeError):
-                    pass
 
             if t_time and name:
                 return "%s %s" % (t_time, name)

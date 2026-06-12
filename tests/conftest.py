@@ -49,19 +49,24 @@ class MockXBMCGUI:
             return 0
 
     class ListItem:
-        def __init__(self, label="", label2="", path=""):
+        def __init__(self, label="", label2="", path="", **kwargs):
             self.label = label
+            self.path = path
 
         def setArt(self, art):
             pass
 
-        def setInfo(self, type, info):
+        def setInfo(self, type, info=None, **kwargs):
+            # Accept both positional and keyword arg styles
             pass
 
-        def addContextMenuItems(self, items):
+        def addContextMenuItems(self, items, **kwargs):
             pass
 
         def setProperty(self, key, value):
+            pass
+
+        def setLabel2(self, label2):
             pass
 
     class Window:

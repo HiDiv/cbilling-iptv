@@ -19,6 +19,8 @@ Endpoints:
 
 import os
 import sys
+from collections import OrderedDict
+from urllib.parse import quote
 
 # Add vendor directory to path for bundled dependencies
 vendor_path = os.path.join(os.path.dirname(__file__), "vendor")
@@ -26,22 +28,6 @@ if vendor_path not in sys.path:
     sys.path.insert(0, vendor_path)
 
 import requests
-
-# Import quote for URL encoding
-if sys.version_info[0] >= 3:
-    from urllib.parse import quote
-else:
-    from urllib import quote
-
-try:
-    import simplejson as json
-except ImportError:
-    pass
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 
 
 class CbillingApiError(Exception):
@@ -138,16 +124,16 @@ class CbillingAPI:
             result = response.json(object_pairs_hook=OrderedDict)
             return result
 
-        except requests.exceptions.Timeout:
-            raise CbillingTimeoutError("Request timed out: %s" % path)
-        except requests.exceptions.ConnectionError as e:
-            raise CbillingApiError("Connection error: %s" % str(e))
-        except requests.exceptions.HTTPError:
-            raise CbillingApiError("HTTP %d: %s" % (response.status_code, path))
-        except ValueError as e:
-            raise CbillingApiError("Invalid JSON response: %s" % str(e))
-        except Exception as e:
-            raise CbillingApiError("Request failed: %s" % str(e))
+        except requests.exceptions.Timeout as err:
+            raise CbillingTimeoutError("Request timed out: %s" % path) from err
+        except requests.exceptions.ConnectionError as err:
+            raise CbillingApiError("Connection error: %s" % str(err)) from err
+        except requests.exceptions.HTTPError as err:
+            raise CbillingApiError("HTTP %d: %s" % (response.status_code, path)) from err
+        except ValueError as err:
+            raise CbillingApiError("Invalid JSON response: %s" % str(err)) from err
+        except Exception as err:
+            raise CbillingApiError("Request failed: %s" % str(err)) from err
 
     # ------------------------------------------------------------------
     # Auth endpoints

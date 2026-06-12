@@ -10,7 +10,7 @@ import os
 
 try:
     from sqlite3 import dbapi2 as sqlite
-except:
+except ImportError:
     from pysqlite2 import dbapi2 as sqlite
 
 import xbmc
@@ -25,7 +25,7 @@ if hasattr(xbmcvfs, "translatePath"):
 else:
     __addonUserData__ = xbmc.translatePath(__addon__.getAddonInfo("profile"))
 
-vodCacheFile = os.path.join(__addonUserData__, "vod_cache.db")
+vod_cache_file = os.path.join(__addonUserData__, "vod_cache.db")
 
 
 def debug_log(msg):
@@ -35,12 +35,12 @@ def debug_log(msg):
 
 def vod_cache_init():
     """Initialize VOD cache database"""
-    if os.path.exists(vodCacheFile):
+    if os.path.exists(vod_cache_file):
         return True
 
     debug_log("Creating VOD cache database")
 
-    createCacheTable = """CREATE TABLE vod_cache (
+    create_cache_sql = """CREATE TABLE vod_cache (
                             movie_id INTEGER PRIMARY KEY,
                             movie_data TEXT NOT NULL,
                             cached_at TIMESTAMP DEFAULT (datetime('now','localtime')) NOT NULL,
@@ -48,9 +48,9 @@ def vod_cache_init():
                         )
                     """
 
-    createIndex = "CREATE INDEX idx_vod_cached_at ON vod_cache(cached_at)"
+    create_index_sql = "CREATE INDEX idx_vod_cached_at ON vod_cache(cached_at)"
 
-    createConfigTable = """CREATE TABLE IF NOT EXISTS config (
+    create_config_sql = """CREATE TABLE IF NOT EXISTS config (
                             key TEXT NOT NULL PRIMARY KEY,
                             value TEXT,
                             inserted_at TIMESTAMP DEFAULT (datetime('now','localtime')) NOT NULL,
@@ -58,22 +58,23 @@ def vod_cache_init():
                         )
                     """
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
-        dbCursor.execute(createCacheTable)
-        dbCursor.execute(createIndex)
-        dbCursor.execute(createConfigTable)
-        dbCursor.execute("INSERT INTO config (key, value) VALUES (?,?)", ("db_version", "1.0"))
-        dbConn.commit()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
+        db_cursor.execute(create_cache_sql)
+        db_cursor.execute(create_index_sql)
+        db_cursor.execute(create_config_sql)
+        db_cursor.execute("INSERT INTO config (key, value) VALUES (?,?)", ("db_version", "1.0"))
+        db_conn.commit()
         debug_log("VOD cache database created successfully")
         return True
     except Exception as e:
         debug_log("Failed to create VOD cache database: %s" % str(e))
         return False
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_get(movie_id, max_age_days=None):
@@ -87,25 +88,26 @@ def vod_cache_get(movie_id, max_age_days=None):
     Returns:
         dict: Movie metadata or None if not found/expired
     """
-    if not os.path.exists(vodCacheFile):
+    if not os.path.exists(vod_cache_file):
         return None
 
     if max_age_days is None:
         max_age_days = int(__addon__.getSetting("vod_cache_ttl_days") or "7")
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
         # Calculate expiration timestamp
         expiration = datetime.datetime.now() - datetime.timedelta(days=max_age_days)
         expiration_str = expiration.strftime("%Y-%m-%d %H:%M:%S")
 
-        dbCursor.execute(
+        db_cursor.execute(
             "SELECT movie_data FROM vod_cache WHERE movie_id = ? AND cached_at > ?", (int(movie_id), expiration_str)
         )
 
-        row = dbCursor.fetchone()
+        row = db_cursor.fetchone()
         if row:
             debug_log("Cache HIT for movie_id=%s" % movie_id)
             return json.loads(row[0])
@@ -117,8 +119,8 @@ def vod_cache_get(movie_id, max_age_days=None):
         debug_log("Error reading from cache: %s" % str(e))
         return None
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_set(movie_id, movie_data):
@@ -132,24 +134,24 @@ def vod_cache_set(movie_id, movie_data):
     Returns:
         bool: Success status
     """
-    if not os.path.exists(vodCacheFile):
-        if not vod_cache_init():
-            return False
+    if not os.path.exists(vod_cache_file) and not vod_cache_init():
+        return False
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
         movie_json = json.dumps(movie_data, ensure_ascii=False)
 
         # Insert or replace
-        dbCursor.execute(
+        db_cursor.execute(
             """INSERT OR REPLACE INTO vod_cache (movie_id, movie_data, cached_at, updated_at)
                VALUES (?, ?, datetime('now','localtime'), datetime('now','localtime'))""",
             (int(movie_id), movie_json),
         )
 
-        dbConn.commit()
+        db_conn.commit()
         debug_log("Cached movie_id=%s" % movie_id)
         return True
 
@@ -157,8 +159,8 @@ def vod_cache_set(movie_id, movie_data):
         debug_log("Error writing to cache: %s" % str(e))
         return False
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_get_multiple(movie_ids, max_age_days=None):
@@ -172,15 +174,16 @@ def vod_cache_get_multiple(movie_ids, max_age_days=None):
     Returns:
         dict: {movie_id: movie_data} for found items
     """
-    if not os.path.exists(vodCacheFile) or not movie_ids:
+    if not os.path.exists(vod_cache_file) or not movie_ids:
         return {}
 
     if max_age_days is None:
         max_age_days = int(__addon__.getSetting("vod_cache_ttl_days") or "7")
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
         expiration = datetime.datetime.now() - datetime.timedelta(days=max_age_days)
         expiration_str = expiration.strftime("%Y-%m-%d %H:%M:%S")
@@ -188,10 +191,10 @@ def vod_cache_get_multiple(movie_ids, max_age_days=None):
         placeholders = ",".join("?" * len(movie_ids))
         query = "SELECT movie_id, movie_data FROM vod_cache WHERE movie_id IN (%s) AND cached_at > ?" % placeholders
 
-        dbCursor.execute(query, [int(mid) for mid in movie_ids] + [expiration_str])
+        db_cursor.execute(query, [int(mid) for mid in movie_ids] + [expiration_str])
 
         result = {}
-        for row in dbCursor.fetchall():
+        for row in db_cursor.fetchall():
             result[str(row[0])] = json.loads(row[1])
 
         debug_log("Cache: found %d/%d movies" % (len(result), len(movie_ids)))
@@ -201,8 +204,8 @@ def vod_cache_get_multiple(movie_ids, max_age_days=None):
         debug_log("Error reading multiple from cache: %s" % str(e))
         return {}
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_set_multiple(movies_data):
@@ -218,28 +221,28 @@ def vod_cache_set_multiple(movies_data):
     if not movies_data:
         return 0
 
-    if not os.path.exists(vodCacheFile):
-        if not vod_cache_init():
-            return 0
+    if not os.path.exists(vod_cache_file) and not vod_cache_init():
+        return 0
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
         cached_count = 0
         for movie_id, movie_data in movies_data.items():
             try:
                 movie_json = json.dumps(movie_data, ensure_ascii=False)
-                dbCursor.execute(
+                db_cursor.execute(
                     """INSERT OR REPLACE INTO vod_cache (movie_id, movie_data, cached_at, updated_at)
                        VALUES (?, ?, datetime('now','localtime'), datetime('now','localtime'))""",
                     (int(movie_id), movie_json),
                 )
                 cached_count += 1
-            except:
+            except (ValueError, TypeError, sqlite.Error):
                 pass
 
-        dbConn.commit()
+        db_conn.commit()
         debug_log("Cached %d movies" % cached_count)
         return cached_count
 
@@ -247,8 +250,8 @@ def vod_cache_set_multiple(movies_data):
         debug_log("Error writing multiple to cache: %s" % str(e))
         return 0
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_clear_old(max_age_days=None):
@@ -261,28 +264,29 @@ def vod_cache_clear_old(max_age_days=None):
     Returns:
         int: Number of deleted entries
     """
-    if not os.path.exists(vodCacheFile):
+    if not os.path.exists(vod_cache_file):
         return 0
 
     if max_age_days is None:
         max_age_days = int(__addon__.getSetting("vod_cache_ttl_days") or "7")
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
         expiration = datetime.datetime.now() - datetime.timedelta(days=max_age_days)
         expiration_str = expiration.strftime("%Y-%m-%d %H:%M:%S")
 
-        dbCursor.execute("DELETE FROM vod_cache WHERE cached_at <= ?", (expiration_str,))
-        deleted = dbCursor.rowcount
+        db_cursor.execute("DELETE FROM vod_cache WHERE cached_at <= ?", (expiration_str,))
+        deleted = db_cursor.rowcount
 
-        dbConn.commit()
+        db_conn.commit()
 
         if deleted > 0:
             debug_log("Cleared %d old cache entries" % deleted)
             # Vacuum to reclaim space
-            dbCursor.execute("VACUUM")
+            db_cursor.execute("VACUUM")
 
         return deleted
 
@@ -290,8 +294,8 @@ def vod_cache_clear_old(max_age_days=None):
         debug_log("Error clearing old cache: %s" % str(e))
         return 0
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_clear_all():
@@ -301,22 +305,23 @@ def vod_cache_clear_all():
     Returns:
         bool: Success status
     """
-    if not os.path.exists(vodCacheFile):
+    if not os.path.exists(vod_cache_file):
         return True
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
-        dbCursor.execute("DELETE FROM vod_cache")
-        deleted = dbCursor.rowcount
+        db_cursor.execute("DELETE FROM vod_cache")
+        deleted = db_cursor.rowcount
 
-        dbConn.commit()
+        db_conn.commit()
 
         debug_log("Cleared all cache (%d entries)" % deleted)
 
         # Vacuum to reclaim space
-        dbCursor.execute("VACUUM")
+        db_cursor.execute("VACUUM")
 
         return True
 
@@ -324,8 +329,8 @@ def vod_cache_clear_all():
         debug_log("Error clearing all cache: %s" % str(e))
         return False
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_delete(movie_id):
@@ -338,15 +343,16 @@ def vod_cache_delete(movie_id):
     Returns:
         bool: Success status
     """
-    if not os.path.exists(vodCacheFile):
+    if not os.path.exists(vod_cache_file):
         return True
 
+    db_conn = None
     try:
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
-        dbCursor.execute("DELETE FROM vod_cache WHERE movie_id = ?", (int(movie_id),))
-        dbConn.commit()
+        db_cursor.execute("DELETE FROM vod_cache WHERE movie_id = ?", (int(movie_id),))
+        db_conn.commit()
 
         debug_log("Deleted movie_id=%s from cache" % movie_id)
         return True
@@ -355,8 +361,8 @@ def vod_cache_delete(movie_id):
         debug_log("Error deleting from cache: %s" % str(e))
         return False
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()
 
 
 def vod_cache_get_stats():
@@ -366,24 +372,25 @@ def vod_cache_get_stats():
     Returns:
         dict: {total: int, size_mb: float, oldest: str, newest: str}
     """
-    if not os.path.exists(vodCacheFile):
+    if not os.path.exists(vod_cache_file):
         return {"total": 0, "size_mb": 0, "oldest": None, "newest": None}
 
+    db_conn = None
     try:
         # File size
-        size_bytes = os.path.getsize(vodCacheFile)
+        size_bytes = os.path.getsize(vod_cache_file)
         size_mb = size_bytes / (1024.0 * 1024.0)
 
-        dbConn = sqlite.connect(vodCacheFile, timeout=10)
-        dbCursor = dbConn.cursor()
+        db_conn = sqlite.connect(vod_cache_file, timeout=10)
+        db_cursor = db_conn.cursor()
 
         # Total count
-        dbCursor.execute("SELECT COUNT(*) FROM vod_cache")
-        total = dbCursor.fetchone()[0]
+        db_cursor.execute("SELECT COUNT(*) FROM vod_cache")
+        total = db_cursor.fetchone()[0]
 
         # Oldest and newest
-        dbCursor.execute("SELECT MIN(cached_at), MAX(cached_at) FROM vod_cache")
-        row = dbCursor.fetchone()
+        db_cursor.execute("SELECT MIN(cached_at), MAX(cached_at) FROM vod_cache")
+        row = db_cursor.fetchone()
         oldest = row[0] if row[0] else None
         newest = row[1] if row[1] else None
 
@@ -393,5 +400,5 @@ def vod_cache_get_stats():
         debug_log("Error getting cache stats: %s" % str(e))
         return {"total": 0, "size_mb": 0, "oldest": None, "newest": None}
     finally:
-        if dbConn:
-            dbConn.close()
+        if db_conn:
+            db_conn.close()

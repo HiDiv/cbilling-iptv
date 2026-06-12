@@ -34,8 +34,8 @@ def log(message, loglevel=xbmc.LOGDEBUG):
 
 def showNotification(title, message):
     xbmcgui.Dialog().notification(
-        encode(getString(30000)),
-        encode(message),
+        getString(30000),
+        message,
         time=4000,
         icon=fsTranslatePath(__Addon.getAddonInfo("path") + "/icon.png"),
         sound=False,
@@ -54,7 +54,9 @@ def getString(string_id):
     return __Addon.getLocalizedString(string_id)
 
 
-def getRegionalTimestamp(date_time, dateformat=["dateshort"]):
+def getRegionalTimestamp(date_time, dateformat=None):
+    if dateformat is None:
+        dateformat = ["dateshort"]
     result = ""
 
     for aFormat in dateformat:

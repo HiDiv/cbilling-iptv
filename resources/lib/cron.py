@@ -1,20 +1,14 @@
 # SPDX-FileCopyrightText: Thamerlan
+# SPDX-FileCopyrightText: 2026 HiDiv <hidiv71@gmail.com>
 # SPDX-License-Identifier: AGPL-3.0-only
-# from __future__ import absolute_import, division, unicode_literals
+import datetime
 import time
+import xml.dom.minidom
+import xml.parsers.expat
 
 import xbmc
 import xbmcvfs
-
-try:
-    # Python 3+
-    from xbmcvfs import translatePath as fsTranslatePath
-except ImportError:
-    # Python 2
-    from xbmc import translatePath as fsTranslatePath
-
-import datetime
-import xml.dom.minidom
+from xbmcvfs import translatePath as fsTranslatePath
 
 from resources.lib import utils as utils
 from resources.lib.croniter import croniter
@@ -32,10 +26,9 @@ class CronJob:
 class CronManager:
     CRONFILE = "special://profile/addon_data/plugin.video.cbilling.iptv/cron.xml"
 
-    jobs = {}  # format {job_id:job_obj}
-    last_read = time.time()
-
     def __init__(self):
+        self.jobs = {}  # format {job_id:job_obj}
+        self.last_read = time.time()
         self.jobs = self._readCronFile()
 
     def addJob(self, job):
@@ -43,7 +36,7 @@ class CronManager:
         try:
             # verify the cron expression here, throws ValueError if wrong
             croniter(job.expression)
-        except:
+        except (ValueError, TypeError, KeyError):
             # didn't work
             return False
 
@@ -115,7 +108,7 @@ class CronManager:
         result = 0
 
         # find the next largest id
-        for k in self.jobs.keys():
+        for k in self.jobs:
             if k >= result:
                 result = k + 1
 
@@ -156,8 +149,9 @@ class CronManager:
                 utils.log(tempJob.name + " " + tempJob.expression + " loaded")
                 adv_jobs[tempJob.id] = tempJob
 
-        except OSError:
-            # the file doesn't exist, return empty array
+        except (OSError, xml.parsers.expat.ExpatError):
+            # file missing or malformed XML — create valid empty cron.xml
+            utils.log("cron.xml missing or malformed, creating empty file", xbmc.LOGWARNING)
             doc = xml.dom.minidom.Document()
             rootNode = doc.createElement("cron")
             doc.appendChild(rootNode)

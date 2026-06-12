@@ -14,35 +14,60 @@ import zipfile
 
 # Files and directories to exclude from the package
 EXCLUDE_PATTERNS = [
+    # Version control and IDE
     ".git",
     ".gitignore",
+    ".kiro",
+    ".vscode",
+    # Environment and secrets
     ".env",
     ".env.example",
+    # Virtual environments
     "venv",
-    ".venv",  # Exclude .venv directory
+    ".venv",
+    # Python bytecode
     "__pycache__",
     "*.pyc",
     "*.pyo",
+    # OS junk
     ".DS_Store",
     "Thumbs.db",
-    "*.md",  # Exclude all markdown documentation files
-    "*.log",  # Exclude log files
-    "test_",  # Exclude test files (test_*.py)
-    "api_explorer",  # Exclude API exploration scripts
+    # Documentation (not needed in addon)
+    "*.md",
+    # Log files
+    "*.log",
+    # Test infrastructure (entire directories)
+    "tests",
+    # Development environment
+    "dev",
+    # Build and cache artifacts
+    "dist",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".coverage",
+    # Build/config files not needed in addon
+    "build_addon.py",
+    "pyproject.toml",
+    "Makefile",
+    # Legacy files removed during refactoring
+    "ordereddict.py",
+    # Test and exploration scripts
+    "test_",
+    "api_explorer",
     "api_test",
     "compare_",
+    # JSON data files from development
     "auth_info_response.json",
     "api_test_results.json",
     "streams_response.json",
     "swagger-docs.json",
+    # Build notes
     "FILES_CREATED.txt",
     "PACKAGING_NOTES.txt",
     "BUILD_SUMMARY.txt",
     "INSTALL.md",
-    "build_addon.py",  # Exclude this build script
-    "dist",  # Exclude dist folder
-    ".kiro",  # Exclude Kiro config
-    ".vscode",  # Exclude VSCode config
+    # Docs directory
+    "docs",
 ]
 
 
