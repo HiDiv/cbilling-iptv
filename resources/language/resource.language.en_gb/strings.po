@@ -652,3 +652,7 @@ msgstr ""
 msgctxt "#30160"
 msgid "in %d min."
 msgstr ""
+
+msgctxt "#30161"
+msgid "Watch from start"
+msgstr ""

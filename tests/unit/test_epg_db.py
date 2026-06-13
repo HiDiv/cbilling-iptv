@@ -91,9 +91,8 @@ class TestDbConnection:
         from epg_db import db_connection
 
         with patch("resources.lib.kodi_helpers.debug_log") as mock_debug_log:
-            with pytest.raises(RuntimeError):
-                with db_connection(db_path) as (_conn, _cursor):
-                    raise RuntimeError("test error")
+            with pytest.raises(RuntimeError), db_connection(db_path) as (_conn, _cursor):
+                raise RuntimeError("test error")
 
             # kodi_helpers.debug_log should have been called
             mock_debug_log.assert_called_once()
@@ -470,7 +469,6 @@ class TestReload:
     def test_reload_with_interactive_dialog(self, tmp_path):
         """reload with background_job=False uses DialogProgress."""
         import xbmcgui
-
         from epg_db import reload
 
         ctx = _make_ctx(tmp_path)

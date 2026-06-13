@@ -1,0 +1,38 @@
+# Reference container for visual comparison with stable v2.1.0
+#
+# Windowed mode:
+#   docker compose -f docker-compose.ref.yml -f docker-compose.ref.gpu.yml up -d
+#
+# Headless mode (noVNC):
+#   docker compose -f docker-compose.ref.yml up -d
+#   Access: http://localhost:28000/vnc.html
+#
+# Stop:
+#   docker compose -f docker-compose.ref.yml down -v
+
+services:
+  kodi20-ref:
+    image: ${KODI20_IMAGE:-ghcr.io/hidiv/kodi-docker:kodi20-v0.1.0}
+    container_name: cbilling-ref-kodi20
+    environment:
+      KODI_MODE: ${KODI_MODE:-windowed}
+      KODI_RESOLUTION: ${KODI_RESOLUTION:-1280x720}
+      ENABLE_VNC: "true"
+      ENABLE_NOVNC: "true"
+      TZ: Europe/Moscow
+    volumes:
+      - ./kodi_data_ref:/root/.kodi
+    ports:
+      - "28080:8080"
+      - "29090:9090"
+      - "25900:5900"
+      - "28000:8000"
+    healthcheck:
+      test: >-
+        curl -sf -X POST -H "Content-Type: application/json"
+        -d '{"jsonrpc":"2.0","method":"JSONRPC.Ping","id":1}'
+        http://localhost:8080/jsonrpc || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

@@ -41,7 +41,7 @@ def main():
     api = CbillingAPI(api_url, public_key)
 
     # Construct adapter with timezone from settings
-    timezone_name = str(addon.getSetting("timezone"))
+    timezone_name = str(addon.getSetting("stb_timezone"))
     adapter = ApiAdapter(api, timezone_name=timezone_name)
 
     # Build context

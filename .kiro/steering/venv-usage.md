@@ -9,25 +9,37 @@ inclusion: always
 
 **Current venv:** `.venv` (created via `uv venv --python 3.8`)
 **Python version:** 3.8.20
+**Working directory:** `/home/hidiv/work/docker/cbilling-iptv` (NEVER change it)
 **Reason:** Compatibility with Kodi 19.4 (Python 3.8)
 
 ## CRITICALLY IMPORTANT
 
-### 1. Activating venv
+### 0. NEVER use `cd` to the project directory
 
-**Activate venv ONLY ONCE per session:**
-- After starting a terminal
-- After closing and reopening a terminal
-- If the terminal was recreated
+**We are ALWAYS in `/home/hidiv/work/docker/cbilling-iptv`.**
 
-**Activation command:**
 ```bash
-source .venv/bin/activate
+# ❌ ABSOLUTELY FORBIDDEN — never do this
+cd /home/hidiv/work/docker/cbilling-iptv && source .venv/bin/activate && python3 ...
+
+# ✅ CORRECT — we are already there
+source .venv/bin/activate && python3 ...
 ```
 
-**DO NOT activate venv:**
-- With every command
-- If venv is already activated in the current session
+**DO NOT prefix commands with `cd /home/hidiv/work/docker/cbilling-iptv`.**
+All commands run in the project root by default.
+
+### 1. ALWAYS activate venv before python
+
+**Every command that invokes `python3` MUST be preceded by `source .venv/bin/activate`:**
+
+```bash
+source .venv/bin/activate && python3 -m pytest tests/ --tb=short
+source .venv/bin/activate && python3 build_addon.py
+source .venv/bin/activate && ruff check .
+```
+
+This is required because each `execute_bash` call starts a fresh shell — the venv is NOT preserved between calls.
 
 ### 2. Running Python
 

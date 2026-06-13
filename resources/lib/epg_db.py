@@ -449,17 +449,86 @@ def get_current_epg(ctx: "AddonContext", aliases: List[str]) -> Dict[str, dict]:
 
 
 def epg_show(ctx: "AddonContext", params: dict) -> None:
-    """
-    Show full EPG for a specific channel (router dispatch handler).
+    """Show full EPG for a specific channel in a text viewer dialog.
 
-    This is a stub. Full UI logic will be completed when the
-    channels module is done.
+    Fetches 2 days of EPG via adapter and displays future events
+    in a TextViewer window.
 
     Args:
         ctx: AddonContext instance.
         params: Router parameter dict (contains channel_id, channel_title).
     """
-    pass
+    import datetime
+    import time as time_mod
+    from urllib.parse import unquote as url_unquote
+
+    import xbmc
+    import xbmcgui
+
+    from resources.lib import kodi_helpers
+
+    channel_id = params.get("channel_id", "")
+    channel_title_raw = params.get("channel_title", "")
+    channel_title = url_unquote(channel_title_raw) if channel_title_raw else ""
+
+    kodi_helpers.debug_log("[epg_show] channel_id=%s" % channel_id)
+
+    # Open text viewer window
+    xbmc.executebuiltin("ActivateWindow(%d)" % 10147)
+    window = xbmcgui.Window(10147)
+
+    now_ts = int(time_mod.time())
+    channel_data = []
+
+    # Fetch 2 days of EPG
+    for day_offset in range(0, 2):
+        date_obj = datetime.datetime.fromtimestamp(now_ts) + datetime.timedelta(days=day_offset)
+        date_str = date_obj.strftime("%Y-%m-%d")
+        try:
+            day_epg = ctx.adapter.get_day_epg(channel_id, date=date_str)
+            if day_epg:
+                channel_data += day_epg
+        except Exception:
+            continue
+
+    if not channel_data:
+        kodi_helpers.show_notification("Cbilling", kodi_helpers.get_localized(ctx.settings, 30065), 2000)
+        return
+
+    # Sort by stop_timestamp
+    with contextlib.suppress(ValueError, TypeError):
+        channel_data = sorted(channel_data, key=lambda x: int(x.get("stop_timestamp", 0)))
+
+    # Build text
+    text = ""
+    current_date = ""
+
+    for epg_data in channel_data:
+        stop_ts = int(epg_data.get("stop_timestamp", 0) or 0)
+        if stop_ts < now_ts:
+            continue
+
+        start_ts = int(epg_data.get("start_timestamp", 0) or 0)
+        if start_ts:
+            epg_date = ctx.adapter._ts_to_local_str(start_ts, "%d-%m-%Y")
+        else:
+            continue
+
+        if current_date != epg_date:
+            current_date = epg_date
+            if text:
+                text += "\r\n\r\n"
+            text += "[B]%s[/B]" % epg_date
+            text += "\r\n%s" % ("~" * 40)
+
+        t_time = epg_data.get("t_time", "")
+        t_time_to = epg_data.get("t_time_to", "")
+        name = epg_data.get("name", "")
+        text += "\r\n%s - %s | %s " % (t_time, t_time_to, name)
+
+    xbmc.sleep(100)
+    window.getControl(1).setLabel(channel_title)
+    window.getControl(5).setText(text)
 
 
 def cron_epg_init(ctx: "AddonContext", params: dict) -> None:

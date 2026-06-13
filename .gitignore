@@ -53,6 +53,7 @@ tests/e2e/artifacts/
 
 # Dev environment runtime data (settings may contain secrets)
 dev/kodi_data/
+dev/kodi_data_ref/
 
 # Temporary files
 temp/

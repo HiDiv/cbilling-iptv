@@ -56,8 +56,54 @@ def check_credentials(ctx, cron_job_request):
 def get_stream_servers(ctx, params):
     """Show dialog to select from available stream servers.
 
+    Fetches server list from API, shows selection dialog,
+    saves user choice to settings.
+
     Args:
         ctx: AddonContext with settings and api_client.
         params: Router parameters dict.
     """
-    pass
+    import xbmcgui
+
+    from resources.lib import kodi_helpers
+
+    current_server = str(ctx.settings.getSetting("user_server"))
+    if not current_server or len(current_server) < 2:
+        kodi_helpers.show_notification("Cbilling", "ERROR: No server configured", 2000)
+        return
+
+    try:
+        servers_data = ctx.api.get_servers()
+        if not servers_data:
+            kodi_helpers.show_notification("Cbilling", "No servers available", 2000)
+            return
+
+        listing = []
+        active_pos = 0
+        for srv in servers_data:
+            item = xbmcgui.ListItem(
+                path=str(srv["name"]),
+                label="%s [%s]" % (str(srv["country"]), str(srv["name"])),
+                offscreen=True,
+            )
+            listing.append(item)
+            if current_server == str(srv["name"]):
+                active_pos = len(listing) - 1
+
+        dialog = xbmcgui.Dialog()
+        ret = dialog.select(
+            kodi_helpers.get_localized(ctx.settings, 30128), listing, preselect=active_pos
+        )
+
+        if ret is not None and ret >= 0:
+            new_server = str(listing[ret].getPath())
+            ctx.settings.setSetting("user_server", new_server)
+            kodi_helpers.show_notification(
+                "Cbilling",
+                "%s: %s" % (kodi_helpers.get_localized(ctx.settings, 30127), new_server),
+                2000,
+            )
+
+    except Exception as exc:
+        kodi_helpers.debug_log("[get_stream_servers] Error: %s" % str(exc))
+        kodi_helpers.show_notification("Cbilling", "ERROR: Failed to load servers", 2000)

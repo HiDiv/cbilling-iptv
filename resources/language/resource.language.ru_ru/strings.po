@@ -652,3 +652,7 @@ msgstr "%d мин. идёт"
 msgctxt "#30160"
 msgid "in %d min."
 msgstr "через %d мин."
+
+msgctxt "#30161"
+msgid "Watch from start"
+msgstr "Смотреть с начала"

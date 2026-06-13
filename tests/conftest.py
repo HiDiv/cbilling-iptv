@@ -82,6 +82,9 @@ class MockXBMCGUI:
 
 
 class MockXBMCPlugin:
+    SORT_METHOD_LABEL = 1
+    SORT_METHOD_LABEL_IGNORE_THE = 2
+
     @staticmethod
     def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=0):
         pass
@@ -100,6 +103,10 @@ class MockXBMCPlugin:
 
     @staticmethod
     def setContent(handle, content):
+        pass
+
+    @staticmethod
+    def addSortMethod(handle, sortMethod):
         pass
 
 
