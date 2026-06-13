@@ -259,26 +259,52 @@ def get_ordered_list(ctx: "AddonContext", params: dict) -> None:
         missing_ids = [mid for mid in movie_ids if mid not in cached_data]
 
         if missing_ids:
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+
+            from resources.lib.api_client import CbillingAPI
+
             loaded = {}
-            for idx, mid in enumerate(missing_ids):
-                if dialog.iscanceled():
-                    break
-                dialog.update(
-                    int((idx + 1) * 100 / len(missing_ids)),
-                    "%s (%d/%d)..." % (_get_txt(ctx, 30068), idx + 1, len(missing_ids)),
-                )
+            dialog.update(0, "%s (0/%d)..." % (_get_txt(ctx, 30068), len(missing_ids)))
+
+            # Separate API client with short timeout for preloading
+            preload_api = CbillingAPI(
+                base_url=str(ctx.settings.getSetting("api_url")),
+                public_key=str(ctx.settings.getSetting("user_login")),
+                timeout=10,
+            )
+
+            def _load_movie(movie_id):
                 try:
-                    video_info = ctx.api.get_video(mid)
+                    video_info = preload_api.get_video(movie_id)
                     if isinstance(video_info, dict) and "data" in video_info:
-                        loaded[mid] = video_info["data"]
+                        return (movie_id, video_info["data"])
                     elif video_info:
-                        loaded[mid] = video_info
+                        return (movie_id, video_info)
                 except Exception as e:
-                    kodi_helpers.debug_log("[vod.get_ordered_list] Preload error %s: %s" % (mid, str(e)))
+                    kodi_helpers.debug_log("[vod.preload] Error %s: %s" % (movie_id, str(e)))
+                return (movie_id, None)
+
+            loaded_count = 0
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                futures = {executor.submit(_load_movie, mid): mid for mid in missing_ids}
+                for future in as_completed(futures):
+                    loaded_count += 1
+                    movie_id, data = future.result()
+                    if data is not None:
+                        loaded[movie_id] = data
+                    if loaded_count % 5 == 0 or loaded_count == len(missing_ids):
+                        dialog.update(
+                            int(loaded_count * 100 / len(missing_ids)),
+                            "%s (%d/%d)..." % (_get_txt(ctx, 30068), loaded_count, len(missing_ids)),
+                        )
+                    if dialog.iscanceled():
+                        break
 
             if loaded:
                 vod_cache_set_multiple(loaded)
                 cached_data.update(loaded)
+    else:
+        cached_data = {}
 
     dialog.close()
 
@@ -290,6 +316,29 @@ def get_ordered_list(ctx: "AddonContext", params: dict) -> None:
         poster = movie.get("poster", "")
         year = movie.get("year", "")
         is_series = bool(movie.get("seasons")) or movie.get("type") == "series"
+
+        # Fallback: detect series from category name
+        if not is_series:
+            category_name = movie.get("category", "")
+            if category_name and (
+                "\u0441\u0435\u0440\u0438\u0430\u043b" in category_name.lower()
+                or "serial" in category_name.lower()
+                or "\u0442\u0432-\u0448\u043e\u0443" in category_name.lower()
+            ):
+                is_series = True
+
+        # Get description from preloaded metadata (if available)
+        plot = ""
+        if vod_preload_enabled and movie_id in cached_data:
+            meta = cached_data[movie_id]
+            if isinstance(meta, dict):
+                plot = meta.get("description", meta.get("descr", ""))
+                # Use poster from metadata if not in list data
+                if not poster:
+                    poster = meta.get("poster", "")
+                # Detect series from metadata (list API doesn't have 'seasons' field)
+                if not is_series and meta.get("seasons"):
+                    is_series = True
 
         label = "[COLOR white][B]%s[/B][/COLOR]" % title
         if year:
@@ -313,7 +362,12 @@ def get_ordered_list(ctx: "AddonContext", params: dict) -> None:
 
         item = xbmcgui.ListItem(label, offscreen=True)
         item.setArt({"poster": poster, "thumb": poster or thumb_browse, "fanart": fanart_vod})
-        item.setInfo(type="video", infoLabels={"title": title, "year": year, "mediatype": "movie"})
+        item.setInfo(type="video", infoLabels={
+            "title": title,
+            "year": year,
+            "mediatype": "movie",
+            "plot": plot,
+        })
         if not is_folder:
             item.setProperty("IsPlayable", "true")
 
@@ -498,9 +552,9 @@ def get_episodes(ctx: "AddonContext", params: dict) -> None:
     movie_name = url_unquote(get_param(params, "movie_name", default="-"))
     season_name = url_unquote(get_param(params, "season_name", default="-"))
     poster_url = url_unquote(get_param(params, "poster_url", default=""))
+    focus_episode_id = get_param(params, "focus_episode_id", default="0")
 
     _vod_poster, _thumb_browse, _fanart_path = _art_paths(ctx)
-    thumb_play = os.path.join(ctx.addon_dir, "resources", "play.png")
 
     kodi_helpers.debug_log("[vod.get_episodes] movie_id=%s, season_id=%s" % (movie_id, season_id))
 
@@ -522,17 +576,18 @@ def get_episodes(ctx: "AddonContext", params: dict) -> None:
     listing = []
     for episode in info:
         ep_id = str(episode.get("id", "0"))
-        ep_number = episode.get("number", "")
+        ep_number = episode.get("series_number", episode.get("number", ""))
         ep_name = episode.get("name", episode.get("title", ""))
 
         if not ep_name and ep_number:
-            ep_name = "%s %s" % (_get_txt(ctx, 30149), ep_number)
+            ep_name = "%s %s" % (_get_txt(ctx, 30132), ep_number)
         elif not ep_name:
-            ep_name = "Episode %s" % ep_id
+            continue  # Skip episodes with no name and no number
 
-        label = "[COLOR white]%s[/COLOR]" % ep_name
-        if ep_number:
-            label = "[COLOR burlywood]%s.[/COLOR] [COLOR white]%s[/COLOR]" % (ep_number, ep_name)
+        # Plot: series name, season name, episode name
+        plot_desc = "[B]%s[/B][CR]%s[CR]%s" % (movie_name, season_name, ep_name)
+
+        label = "[COLOR burlywood][B]%s[/B][/COLOR]" % ep_name
 
         url = ("%s?mode=vod_play_movie&movie_id=%s&season_id=%s&episode_id=%s&movie_name=%s&season_name=%s") % (
             ctx.plugin_url,
@@ -550,9 +605,10 @@ def get_episodes(ctx: "AddonContext", params: dict) -> None:
                 "title": ep_name,
                 "mediatype": "episode",
                 "Episode": str(ep_number),
+                "plot": plot_desc,
             },
         )
-        list_item.setArt({"poster": poster_url, "thumb": thumb_play, "fanart": poster_url})
+        list_item.setArt({"poster": poster_url, "fanart": poster_url})
         list_item.setProperty("IsPlayable", "true")
 
         # Context menu
@@ -574,6 +630,27 @@ def get_episodes(ctx: "AddonContext", params: dict) -> None:
     xbmcplugin.setContent(ctx.handle, "episodes")
     _apply_viewmode(ctx)
     xbmcplugin.endOfDirectory(ctx.handle, cacheToDisc=False)
+
+    # Position cursor on the episode from watch history
+    if focus_episode_id and focus_episode_id != "0":
+        import contextlib
+
+        import xbmc
+        import xbmcgui as _gui
+
+        focus_index = -1
+        for idx, episode in enumerate(info):
+            if str(episode.get("id", "")) == str(focus_episode_id):
+                focus_index = idx
+                break
+
+        if focus_index >= 0:
+            xbmc.sleep(400)
+            win = _gui.Window(_gui.getCurrentWindowId())
+            cid = win.getFocusId()
+            with contextlib.suppress(Exception):
+                # +1 to account for ".." (parent directory) item at position 0
+                xbmc.executebuiltin("SetFocus(%s, %s, absolute)" % (cid, focus_index + 1))
 
 
 def play_movie(ctx: "AddonContext", params: dict) -> None:
@@ -597,6 +674,8 @@ def play_movie(ctx: "AddonContext", params: dict) -> None:
 
     stream_url = None
     video_metadata = None
+    episode_name = ""
+    episode_number = ""
 
     try:
         if int(season_id) > 0 and int(episode_id) > 0:
@@ -613,6 +692,8 @@ def play_movie(ctx: "AddonContext", params: dict) -> None:
                             stream_url = files[0].get("url", "")
                         if not stream_url:
                             stream_url = ep.get("url", ep.get("cmd", ep.get("file", "")))
+                        episode_name = ep.get("name", ep.get("title", ""))
+                        episode_number = ep.get("series_number", ep.get("number", ""))
                         break
                 # Fallback to first episode
                 if not stream_url and info:
@@ -699,6 +780,8 @@ def play_movie(ctx: "AddonContext", params: dict) -> None:
             "episode_id": episode_id,
             "title": movie_name,
             "season_name": season_name,
+            "episode_name": episode_name,
+            "episode_number": episode_number,
             "poster": history_poster,
             "content_type": history_type,
         }

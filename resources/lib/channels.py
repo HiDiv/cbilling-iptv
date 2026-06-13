@@ -450,16 +450,37 @@ def get_channels_list(ctx, params):
 
         channel_cmd = channel.get("cmd", "")
         channel_has_archive = channel.get("tv_archive_type") == "flussonic_dvr"
+        channel_archive_depth = channel.get("tv_archive_duration", "7")
         name_b64 = re.sub(
             "=", "",
             base64.urlsafe_b64encode(channel_name.encode("utf-8")).decode("utf-8"),
         )
-        url = "%s?mode=play_live_channel&play_cmd=%s&name=%s&channel_id=%s" % (
-            ctx.plugin_url,
-            url_quote(channel_cmd),
-            name_b64,
-            channel_id,
-        )
+
+        if action == "archive" and channel_has_archive:
+            # Archive mode: navigate to date list
+            logo = channel.get("logo", "")
+            url = (
+                "%s?mode=archive_channel_dates&channel_id=%s&depth=%s"
+                "&name=%s&play_cmd=%s&logo_png=%s"
+                % (
+                    ctx.plugin_url,
+                    channel_id,
+                    channel_archive_depth,
+                    name_b64,
+                    url_quote(channel_cmd),
+                    url_quote(logo),
+                )
+            )
+            is_folder = True
+        else:
+            # Live mode: play directly
+            url = "%s?mode=play_live_channel&play_cmd=%s&name=%s&channel_id=%s" % (
+                ctx.plugin_url,
+                url_quote(channel_cmd),
+                name_b64,
+                channel_id,
+            )
+            is_folder = False
 
         # Context menu
         context_menu = []
@@ -515,8 +536,9 @@ def get_channels_list(ctx, params):
         ))
 
         item.addContextMenuItems(items=context_menu, replaceItems=True)
-        item.setProperty("IsPlayable", "true")
-        xbmcplugin.addDirectoryItem(ctx.handle, url, item, False)
+        if not is_folder:
+            item.setProperty("IsPlayable", "true")
+        xbmcplugin.addDirectoryItem(ctx.handle, url, item, is_folder)
 
     dialog.close()
 

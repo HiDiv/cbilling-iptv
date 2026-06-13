@@ -131,9 +131,109 @@ def clear_history(path: str) -> bool:
 def show(ctx: "AddonContext", params: dict) -> None:
     """Render watch history list in Kodi UI.
 
-    Full implementation deferred to task 7.4.
+    Shows previously watched movies and episodes with poster, description,
+    and navigation back to the episode list (for series) or playback (for movies).
     """
-    pass  # pragma: no cover
+    from urllib.parse import quote as url_quote
+
+    import xbmcgui
+    import xbmcplugin
+
+    from resources.lib import kodi_helpers
+
+    history_path = os.path.join(ctx.user_data_dir, HISTORY_FILENAME)
+    history = load_history(history_path)
+
+    if not history:
+        kodi_helpers.show_notification("Cbilling", kodi_helpers.get_localized(ctx.settings, 30146), 3000)
+        xbmcplugin.endOfDirectory(ctx.handle)
+        return
+
+    fanart_vod = os.path.join(ctx.addon_dir, "fanart", "vod_03.jpg")
+
+    for item_data in history:
+        movie_id = item_data.get("movie_id", "")
+        season_id = item_data.get("season_id", "0")
+        episode_id = item_data.get("episode_id", "0")
+        title = item_data.get("title", "")
+        season_name = item_data.get("season_name", "")
+        poster = item_data.get("poster", "")
+        content_type = item_data.get("content_type", item_data.get("type", "movie"))
+
+        # Build display name
+        display_name = title
+        if content_type == "episode":
+            if season_name and season_name != "-":
+                display_name = "%s - %s" % (title, season_name)
+            ep_name = item_data.get("episode_name", "")
+            ep_number = item_data.get("episode_number", "")
+            if ep_name:
+                display_name += ". %s" % ep_name
+            elif ep_number:
+                display_name += ". %s %s" % (
+                    kodi_helpers.get_localized(ctx.settings, 30132), ep_number
+                )
+
+        list_item = xbmcgui.ListItem(display_name, offscreen=True)
+
+        # Artwork
+        if poster:
+            list_item.setArt({"poster": poster, "thumb": poster, "fanart": poster})
+        else:
+            list_item.setArt({"fanart": fanart_vod})
+
+        list_item.setInfo(type="video", infoLabels={"title": display_name})
+
+        # Navigation: episodes → episode list, movies → play
+        if content_type == "episode" and season_id and int(season_id) > 0:
+            list_item.setProperty("IsPlayable", "false")
+            url = (
+                "%s?mode=vod_get_episodes&movie_id=%s&season_id=%s"
+                "&movie_name=%s&season_name=%s&poster_url=%s&focus_episode_id=%s"
+                % (
+                    ctx.plugin_url,
+                    movie_id,
+                    season_id,
+                    url_quote(title.encode("utf-8"), safe=""),
+                    url_quote(season_name.encode("utf-8"), safe="") if season_name else "-",
+                    url_quote(poster, safe="") if poster else "",
+                    episode_id,
+                )
+            )
+            is_folder = True
+        else:
+            list_item.setProperty("IsPlayable", "true")
+            url = (
+                "%s?mode=vod_play_movie&movie_id=%s&season_id=%s"
+                "&episode_id=%s&movie_name=%s&season_name=%s"
+                % (
+                    ctx.plugin_url,
+                    movie_id,
+                    season_id,
+                    episode_id,
+                    url_quote(title.encode("utf-8"), safe=""),
+                    url_quote(season_name.encode("utf-8"), safe="") if season_name else "-",
+                )
+            )
+            is_folder = False
+
+        # Context menu: remove / clear
+        context_menu = [
+            (
+                kodi_helpers.get_localized(ctx.settings, 30144),
+                "RunPlugin(%s?mode=vod_history_remove&movie_id=%s&season_id=%s&episode_id=%s)"
+                % (ctx.plugin_url, movie_id, season_id, episode_id),
+            ),
+            (
+                kodi_helpers.get_localized(ctx.settings, 30145),
+                "RunPlugin(%s?mode=vod_history_clear)" % ctx.plugin_url,
+            ),
+        ]
+        list_item.addContextMenuItems(items=context_menu, replaceItems=False)
+
+        xbmcplugin.addDirectoryItem(ctx.handle, url, list_item, is_folder)
+
+    xbmcplugin.endOfDirectory(ctx.handle, cacheToDisc=False)
 
 
 def remove(ctx: "AddonContext", params: dict) -> None:
@@ -161,9 +261,12 @@ def clear(ctx: "AddonContext", params: dict) -> None:
     import xbmcgui
     import xbmcplugin
 
+    from resources.lib import kodi_helpers
+
     path = os.path.join(ctx.user_data_dir, HISTORY_FILENAME)
     dialog = xbmcgui.Dialog()
-    if dialog.yesno("", ""):
+    if dialog.yesno("Cbilling", kodi_helpers.get_localized(ctx.settings, 30145)):
         clear_history(path)
+        kodi_helpers.show_notification("Cbilling", kodi_helpers.get_localized(ctx.settings, 30147), 2000)
         xbmc.executebuiltin("Container.Refresh")
     xbmcplugin.endOfDirectory(ctx.handle, cacheToDisc=False)

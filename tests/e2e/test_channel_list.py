@@ -182,3 +182,103 @@ class TestChannelListDisplay:
             "Addon should still be functional after epg_show (main menu = 4 items), got %d"
             % len(files)
         )
+
+
+
+@pytest.mark.e2e
+class TestArchiveNavigation:
+    """Tests for archive channel navigation — channels must be folders with dates."""
+
+    def test_archive_channels_are_folders(self, kodi_client):
+        # type: (KodiClient,) -> None
+        """Verify archive channels have filetype=directory (not file).
+
+        Clicking an archive channel should navigate to date list,
+        not start playback.
+        """
+        archive_channels_url = (
+            "plugin://plugin.video.cbilling.iptv/"
+            "?mode=get_channels_list&action=archive&group_id=1&favorites=0"
+        )
+        result = kodi_client.send_request(
+            "Files.GetDirectory",
+            {"directory": archive_channels_url, "media": "files", "properties": ["file"]},
+            timeout=60,
+        )
+        files = result.get("files") or []
+        assert len(files) >= 5, "Expected at least 5 archive channels, got %d" % len(files)
+
+        folders = [f for f in files if f.get("filetype") == "directory"]
+        assert len(folders) >= 3, (
+            "Expected at least 3 archive channels as folders, got %d/%d"
+            % (len(folders), len(files))
+        )
+
+        # Verify URLs contain archive_channel_dates
+        for f in folders[:3]:
+            assert "archive_channel_dates" in f.get("file", ""), (
+                "Archive channel URL should contain archive_channel_dates"
+            )
+
+    def test_archive_channel_shows_dates(self, kodi_client):
+        # type: (KodiClient,) -> None
+        """Verify clicking an archive channel shows a list of dates (days)."""
+        # First get archive channels
+        archive_channels_url = (
+            "plugin://plugin.video.cbilling.iptv/"
+            "?mode=get_channels_list&action=archive&group_id=1&favorites=0"
+        )
+        result = kodi_client.send_request(
+            "Files.GetDirectory",
+            {"directory": archive_channels_url, "media": "files", "properties": ["file"]},
+            timeout=60,
+        )
+        files = result.get("files") or []
+        folders = [f for f in files if f.get("filetype") == "directory"]
+        assert len(folders) >= 1, "Need at least 1 archive channel folder"
+
+        # Navigate into the first archive channel
+        first_channel_url = folders[0].get("file", "")
+        result2 = kodi_client.send_request(
+            "Files.GetDirectory",
+            {"directory": first_channel_url, "media": "files", "properties": ["file"]},
+            timeout=60,
+        )
+        dates = result2.get("files") or []
+        assert len(dates) >= 3, (
+            "Expected at least 3 archive dates, got %d" % len(dates)
+        )
+
+
+@pytest.mark.e2e
+class TestVODSeriesNavigation:
+    """Tests for VOD series detection — series must be folders."""
+
+    def test_series_category_items_are_folders(self, kodi_client):
+        # type: (KodiClient,) -> None
+        """Verify items in 'Сериалы' category are folders (not playable files)."""
+        # Category 2 = Сериалы
+        series_url = (
+            "plugin://plugin.video.cbilling.iptv/"
+            "?mode=vod_get_ordered_list&cat_id=2&genre_id=*&page_nr=1&sortby=added"
+        )
+        result = kodi_client.send_request(
+            "Files.GetDirectory",
+            {"directory": series_url, "media": "files", "properties": ["file"]},
+            timeout=90,
+        )
+        files = result.get("files") or []
+        assert len(files) >= 3, "Expected at least 3 series items, got %d" % len(files)
+
+        folders = [f for f in files if f.get("filetype") == "directory"]
+        ratio = len(folders) / len(files) if files else 0
+        assert ratio >= 0.8, (
+            "Expected at least 80%% of series items to be folders, got %d/%d (%.0f%%)"
+            % (len(folders), len(files), ratio * 100)
+        )
+
+        # Verify URLs contain vod_get_seasons
+        for f in folders[:3]:
+            assert "vod_get_seasons" in f.get("file", ""), (
+                "Series URL should contain vod_get_seasons"
+            )

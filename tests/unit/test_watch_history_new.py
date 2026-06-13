@@ -18,6 +18,7 @@ from watch_history import (
     remove,
     remove_entry,
     save_history,
+    show,
 )
 
 
@@ -269,3 +270,145 @@ class TestClearHandler:
 
         result = load_history(path)
         assert len(result) == 1
+
+
+class TestShowHandler:
+    """Tests for the show() router dispatch handler."""
+
+    def test_show_renders_history_items(self, tmp_path):
+        """show(ctx, params) renders history entries as directory items."""
+        path = str(tmp_path / "watch_history.json")
+        entries = [
+            {"movie_id": "101", "season_id": "0", "episode_id": "0",
+             "title": "Movie One", "season_name": "-", "poster": "http://p1.jpg",
+             "content_type": "movie"},
+            {"movie_id": "202", "season_id": "55", "episode_id": "999",
+             "title": "Series Two", "season_name": "Season 2",
+             "episode_name": "Finale", "episode_number": "10",
+             "poster": "http://p2.jpg", "content_type": "episode"},
+        ]
+        save_history(path, entries)
+
+        ctx = MagicMock()
+        ctx.user_data_dir = str(tmp_path)
+        ctx.handle = 1
+        ctx.plugin_url = "plugin://plugin.video.cbilling.iptv/"
+        ctx.addon_dir = str(tmp_path)
+        ctx.settings = MagicMock()
+        ctx.settings.getLocalizedString.side_effect = lambda sid: "String_%s" % sid
+
+        xbmcplugin = sys.modules["xbmcplugin"]
+        xbmcplugin.addDirectoryItem = MagicMock()
+        xbmcplugin.endOfDirectory = MagicMock()
+
+        show(ctx, {})
+
+        assert xbmcplugin.addDirectoryItem.call_count == 2
+
+    def test_show_episode_display_includes_episode_name(self, tmp_path):
+        """Episode entries in history should include episode name in label."""
+        path = str(tmp_path / "watch_history.json")
+        entries = [
+            {"movie_id": "303", "season_id": "77", "episode_id": "888",
+             "title": "My Series", "season_name": "Season 1",
+             "episode_name": "Pilot", "episode_number": "1",
+             "poster": "", "content_type": "episode"},
+        ]
+        save_history(path, entries)
+
+        ctx = MagicMock()
+        ctx.user_data_dir = str(tmp_path)
+        ctx.handle = 1
+        ctx.plugin_url = "plugin://plugin.video.cbilling.iptv/"
+        ctx.addon_dir = str(tmp_path)
+        ctx.settings = MagicMock()
+        ctx.settings.getLocalizedString.side_effect = lambda sid: "String_%s" % sid
+
+        xbmcplugin = sys.modules["xbmcplugin"]
+        xbmcplugin.addDirectoryItem = MagicMock()
+        xbmcplugin.endOfDirectory = MagicMock()
+
+        # Track ListItem labels
+        labels = []
+        original_li = sys.modules["xbmcgui"].ListItem
+
+        class TrackLI:
+            def __init__(self, label="", **kwargs):
+                self.label = label
+                labels.append(label)
+
+            def setArt(self, *a, **kw):  # noqa: N802
+                pass
+
+            def setInfo(self, *a, **kw):  # noqa: N802
+                pass
+
+            def setProperty(self, *a, **kw):  # noqa: N802
+                pass
+
+            def addContextMenuItems(self, *a, **kw):  # noqa: N802
+                pass
+
+        sys.modules["xbmcgui"].ListItem = TrackLI
+
+        show(ctx, {})
+
+        sys.modules["xbmcgui"].ListItem = original_li
+
+        assert len(labels) == 1
+        assert "Pilot" in labels[0], "Episode name should be in label, got: %s" % labels[0]
+
+    def test_show_episode_url_has_focus_episode_id(self, tmp_path):
+        """Episode entries should have focus_episode_id in URL."""
+        path = str(tmp_path / "watch_history.json")
+        entries = [
+            {"movie_id": "404", "season_id": "88", "episode_id": "777",
+             "title": "Show", "season_name": "S1",
+             "episode_name": "", "episode_number": "",
+             "poster": "", "content_type": "episode"},
+        ]
+        save_history(path, entries)
+
+        ctx = MagicMock()
+        ctx.user_data_dir = str(tmp_path)
+        ctx.handle = 1
+        ctx.plugin_url = "plugin://plugin.video.cbilling.iptv/"
+        ctx.addon_dir = str(tmp_path)
+        ctx.settings = MagicMock()
+        ctx.settings.getLocalizedString.side_effect = lambda sid: "String_%s" % sid
+
+        xbmcplugin = sys.modules["xbmcplugin"]
+        xbmcplugin.addDirectoryItem = MagicMock()
+        xbmcplugin.endOfDirectory = MagicMock()
+
+        show(ctx, {})
+
+        call_args = xbmcplugin.addDirectoryItem.call_args_list[0]
+        url = call_args[0][1] if len(call_args[0]) > 1 else call_args[1].get("url", "")
+        assert "focus_episode_id=777" in url, "URL should contain focus_episode_id"
+
+    def test_clear_dialog_has_text(self, tmp_path):
+        """clear() dialog should show confirmation text, not empty strings."""
+        path = str(tmp_path / "watch_history.json")
+        save_history(path, [{"movie_id": "1", "season_id": "0", "episode_id": "0"}])
+
+        ctx = MagicMock()
+        ctx.user_data_dir = str(tmp_path)
+        ctx.handle = 1
+        ctx.settings = MagicMock()
+        ctx.settings.getLocalizedString.side_effect = lambda sid: "String_%s" % sid
+
+        xbmcplugin = sys.modules["xbmcplugin"]
+        xbmcplugin.endOfDirectory = MagicMock()
+
+        mock_dialog = MagicMock()
+        mock_dialog.yesno.return_value = False
+        sys.modules["xbmcgui"].Dialog = MagicMock(return_value=mock_dialog)
+
+        clear(ctx, {})
+
+        # Verify yesno was called with non-empty strings
+        mock_dialog.yesno.assert_called_once()
+        call_args = mock_dialog.yesno.call_args[0]
+        assert call_args[0] != "", "Dialog title should not be empty"
+        assert call_args[1] != "", "Dialog text should not be empty"

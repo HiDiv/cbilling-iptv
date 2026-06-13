@@ -532,14 +532,15 @@ def epg_show(ctx: "AddonContext", params: dict) -> None:
 
 
 def cron_epg_init(ctx: "AddonContext", params: dict) -> None:
-    """
-    Entry point for cron-triggered EPG rebuild (router dispatch handler).
+    """Entry point for cron-triggered EPG rebuild.
 
-    This is a stub. Full implementation will delegate to auth check
-    and reload when the channels module is done.
+    Delegates to channels.init_and_start with cron_job_request=True,
+    which checks credentials and triggers EPG reload.
 
     Args:
         ctx: AddonContext instance.
         params: Router parameter dict.
     """
-    pass
+    from resources.lib import channels
+
+    channels.init_and_start(ctx, cron_job_request=True)
